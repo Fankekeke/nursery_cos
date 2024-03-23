@@ -32,7 +32,7 @@ public class SavorInfoController {
      */
     @GetMapping("/page")
     public R page(Page<SavorInfo> page, SavorInfo savorInfo) {
-        return R.ok();
+        return R.ok(savorInfoService.selectSavorPage(page, savorInfo));
     }
 
     /**

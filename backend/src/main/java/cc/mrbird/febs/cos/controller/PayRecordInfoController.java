@@ -32,7 +32,7 @@ public class PayRecordInfoController {
      */
     @GetMapping("/page")
     public R page(Page<PayRecordInfo> page, PayRecordInfo payRecordInfo) {
-        return R.ok();
+        return R.ok(payRecordInfoService.selectRecordPage(page, payRecordInfo));
     }
 
     /**

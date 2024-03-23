@@ -32,7 +32,7 @@ public class LeaveInfoController {
      */
     @GetMapping("/page")
     public R page(Page<LeaveInfo> page, LeaveInfo leaveInfo) {
-        return R.ok();
+        return R.ok(leaveInfoService.selectLeavePage(page, leaveInfo));
     }
 
     /**
