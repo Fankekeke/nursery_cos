@@ -5,6 +5,7 @@ import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.TeacherInfo;
 import cc.mrbird.febs.cos.service.ITeacherInfoService;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,16 @@ public class TeacherInfoController {
     @GetMapping("/list")
     public R list() {
         return R.ok(teacherInfoService.list());
+    }
+
+    /**
+     * 教师信息列表
+     *
+     * @return 结果
+     */
+    @GetMapping("/list/check")
+    public R listCheck() {
+        return R.ok(teacherInfoService.list(Wrappers.<TeacherInfo>lambdaQuery().eq(TeacherInfo::getStatus, 1)));
     }
 
     /**

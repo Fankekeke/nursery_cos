@@ -2,4 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.PayRecordInfoMapper">
 
+    <!-- 分页获取缴费记录信息 -->
+    <select id="selectRecordPage" resultType="java.util.LinkedHashMap">
+        select
+            pri.id,
+            pri.student_id,
+            pri.fees_id,
+            pri.price,
+            pri.status,
+            pri.pay_date,
+            si.code as studentCode,
+            si.name as studentName,
+            si.images as studentImages,
+            si.phone,
+            fi.name as feesName
+        from
+            pay_record_info pri
+                left join student_info si on
+                (si.id = pri.student_id)
+            left join fees_info fi on (fi.id = pri.fees_id)
+        where
+            1 = 1
+        <if test="payRecordInfo.studentName != null and payRecordInfo.studentName != ''">
+            AND si.name LIKE CONCAT('%',#{payRecordInfo.studentName},'%')
+        </if>
+        <if test="payRecordInfo.studentCode != null and payRecordInfo.studentCode != ''">
+            AND si.code LIKE CONCAT('%',#{payRecordInfo.studentCode},'%')
+        </if>
+        order by
+            pri.pay_date desc
+    </select>
 </mapper>

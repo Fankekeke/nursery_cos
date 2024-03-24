@@ -2,4 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.SavorInfoMapper">
 
+    <!-- 分页获取学生兴趣信息 -->
+    <select id="selectSavorPage" resultType="java.util.LinkedHashMap">
+        select
+            sai.id,
+            sai.student_id,
+            sai.interest,
+            sai.create_date,
+            si.code as studentCode,
+            si.name as studentName,
+            si.images as studentImages,
+            si.phone
+        from
+            savor_info sai
+                left join student_info si on
+                (si.id = sai.student_id)
+        where
+            1 = 1
+        <if test="savorInfo.studentName != null and savorInfo.studentName != ''">
+            AND si.name LIKE CONCAT('%',#{savorInfo.studentName},'%')
+        </if>
+        <if test="savorInfo.studentCode != null and savorInfo.studentCode != ''">
+            AND si.code LIKE CONCAT('%',#{savorInfo.studentCode},'%')
+        </if>
+        order by
+            sai.create_date desc
+    </select>
 </mapper>

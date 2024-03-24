@@ -2,4 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.MessageInfoMapper">
 
+    <!-- 分页获取消息通知信息 -->
+    <select id="selectMessagePage" resultType="java.util.LinkedHashMap">
+        select
+            mi.id,
+            mi.student_id,
+            mi.content,
+            mi.status,
+            mi.create_date,
+            si.code as studentCode,
+            si.name as studentName,
+            si.phone,
+            si.images as studentImages
+        from
+            message_info mi
+                left join student_info si on
+                (si.id = mi.student_id)
+        where
+            1 = 1
+        <if test="messageInfo.studentName != null and messageInfo.studentName != ''">
+            AND si.name LIKE CONCAT('%',#{messageInfo.studentName},'%')
+        </if>
+        <if test="messageInfo.studentCode != null and messageInfo.studentCode != ''">
+            AND si.code LIKE CONCAT('%',#{messageInfo.studentCode},'%')
+        </if>
+        order by
+            mi.create_date desc
+
+    </select>
 </mapper>

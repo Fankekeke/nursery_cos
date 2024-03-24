@@ -2,4 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.FeesInfoMapper">
 
+    <!-- 分页获取缴费内容信息 -->
+    <select id="selectFeesPage" resultType="java.util.LinkedHashMap">
+        select
+            fi.id,
+            fi.name,
+            fi.content,
+            fi.class_id,
+            fi.create_by,
+            fi.create_date,
+            fi.price,
+            ci.code as classCode,
+            ci.name as className,
+            ci.content
+        from
+            fees_info fi
+                left join classes_info ci on
+                (ci.id = fi.class_id)
+        where
+            1 = 1
+        <if test="feesInfo.name != null and feesInfo.name != ''">
+            AND fi.name LIKE CONCAT('%',#{feesInfo.name},'%')
+        </if>
+        <if test="feesInfo.classCode != null and feesInfo.classCode != ''">
+            AND ci.code LIKE CONCAT('%',#{feesInfo.classCode},'%')
+        </if>
+        <if test="feesInfo.className != null and feesInfo.className != ''">
+            AND ci.name LIKE CONCAT('%',#{feesInfo.className},'%')
+        </if>
+        order by
+            fi.create_date desc
+    </select>
 </mapper>
