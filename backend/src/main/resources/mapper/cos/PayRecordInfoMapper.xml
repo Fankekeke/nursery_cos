@@ -6,6 +6,7 @@
     <select id="selectRecordPage" resultType="java.util.LinkedHashMap">
         select
             pri.id,
+            pri.code,
             pri.student_id,
             pri.fees_id,
             pri.price,

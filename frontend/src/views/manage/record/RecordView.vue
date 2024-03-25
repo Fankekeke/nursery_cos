@@ -1,5 +1,5 @@
 <template>
-  <a-modal v-model="show" title="会员订单详情" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="缴费订单详情" @cancel="onClose" :width="800">
     <template slot="footer">
       <a-button key="back" @click="onClose" type="danger">
         关闭
@@ -8,11 +8,11 @@
     <div style="font-size: 13px;font-family: SimHei" v-if="recordData !== null">
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">基础信息</span></a-col>
-        <a-col :span="8"><b>用户编号：</b>
-          {{ recordData.userCode ? recordData.userCode : '- -' }}
+        <a-col :span="8"><b>学生编号：</b>
+          {{ recordData.studentCode ? recordData.studentCode : '- -' }}
         </a-col>
-        <a-col :span="8"><b>用户名称：</b>
-          {{ recordData.name ? recordData.name : '- -' }}
+        <a-col :span="8"><b>学生姓名：</b>
+          {{ recordData.studentName ? recordData.studentName : '- -' }}
         </a-col>
         <a-col :span="8"><b>联系方式：</b>
           {{ recordData.phone }}
@@ -20,15 +20,15 @@
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>订单编号：</b>
-          {{ recordData.code }}
+        <a-col :span="8"><b>缴费内容：</b>
+          {{ recordData.feesName }}
         </a-col>
         <a-col :span="8"><b>价格：</b>
           {{ recordData.price }} 元
         </a-col>
-        <a-col :span="8"><b>会员等级：</b>
-          <span v-if="recordData.status == 0" style="color: red">未支付</span>
-          <span v-if="recordData.status == 1" style="color: green">已支付</span>
+        <a-col :span="8"><b>缴费状态：</b>
+          <span v-if="recordData.status == 0" style="color: red">未缴费</span>
+          <span v-if="recordData.status == 1" style="color: green">已缴费</span>
         </a-col>
       </a-row>
       <br/>
@@ -38,9 +38,6 @@
         </a-col>
         <a-col :span="8"><b>订单编号：</b>
           {{ recordData.code }}
-        </a-col>
-        <a-col :span="8"><b>会员名称：</b>
-          {{ recordData.memberName }}
         </a-col>
       </a-row>
       <br/>

@@ -7,18 +7,22 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="标题"
+                label="教师姓名"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.title"/>
+                <a-input v-model="queryParams.teacherName"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="内容"
+                label="审批状态"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.content"/>
+                <a-select v-model="queryParams.status">
+                  <a-select-option value="0">未审批</a-select-option>
+                  <a-select-option value="1">通过</a-select-option>
+                  <a-select-option value="2">驳回</a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
           </div>
@@ -31,7 +35,7 @@
     </div>
     <div>
       <div class="operator">
-        <a-button type="primary" ghost @click="add">新增</a-button>
+<!--        <a-button type="primary" ghost @click="add">新增</a-button>-->
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -44,67 +48,51 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
-        <template slot="titleShow" slot-scope="text, record">
-          <template>
-            <a-badge status="processing" v-if="record.rackUp === 1"/>
-            <a-badge status="error" v-if="record.rackUp === 0"/>
-            <a-tooltip>
-              <template slot="title">
-                {{ record.title }}
-              </template>
-              {{ record.title.slice(0, 8) }} ...
-            </a-tooltip>
-          </template>
-        </template>
         <template slot="contentShow" slot-scope="text, record">
           <template>
             <a-tooltip>
               <template slot="title">
-                {{ record.content }}
+                {{ record.auditTitle }}
               </template>
-              {{ record.content.slice(0, 40) }} ...
+              {{ record.auditTitle.slice(0, 20) }} ...
             </a-tooltip>
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
+          <a-icon type="file-search" @click="memberViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
-    <bulletin-add
-      v-if="bulletinAdd.visiable"
-      @close="handleBulletinAddClose"
-      @success="handleBulletinAddSuccess"
-      :bulletinAddVisiable="bulletinAdd.visiable">
-    </bulletin-add>
-    <bulletin-edit
-      ref="bulletinEdit"
-      @close="handleBulletinEditClose"
-      @success="handleBulletinEditSuccess"
-      :bulletinEditVisiable="bulletinEdit.visiable">
-    </bulletin-edit>
+    <member-view
+      @close="handlememberViewClose"
+      :memberShow="memberView.visiable"
+      :memberData="memberView.data">
+    </member-view>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
-import BulletinAdd from './BulletinAdd'
-import BulletinEdit from './BulletinEdit'
+import memberView from './LeaveView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'Bulletin',
-  components: {BulletinAdd, BulletinEdit, RangeDate},
+  name: 'member',
+  components: {memberView, RangeDate},
   data () {
     return {
       advanced: false,
-      bulletinAdd: {
+      memberAdd: {
         visiable: false
       },
-      bulletinEdit: {
+      memberEdit: {
         visiable: false
+      },
+      memberView: {
+        visiable: false,
+        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -129,16 +117,12 @@ export default {
       currentUser: state => state.account.user
     }),
     columns () {
-      return [{
-        title: '标题',
-        dataIndex: 'title'
+      return [ {
+        title: '教师编号',
+        dataIndex: 'teacherCode'
       }, {
-        title: '公告内容',
-        dataIndex: 'content',
-        scopedSlots: { customRender: 'contentShow' }
-      }, {
-        title: '发布时间',
-        dataIndex: 'date',
+        title: '教师名称',
+        dataIndex: 'teacherName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -147,21 +131,49 @@ export default {
           }
         }
       }, {
-        title: '上下架',
-        dataIndex: 'type',
+        title: '教师头像',
+        dataIndex: 'teacherImages',
+        customRender: (text, record, index) => {
+          if (!record.teacherImages) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.teacherImages.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.teacherImages.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '请假内容',
+        dataIndex: 'auditTitle',
+        scopedSlots: { customRender: 'contentShow' }
+      }, {
+        title: '审批状态',
+        dataIndex: 'status',
         customRender: (text, row, index) => {
           switch (text) {
-            case 1:
-              return <a-tag>上架</a-tag>
-            case 2:
-              return <a-tag>下架</a-tag>
+            case '0':
+              return <a-tag>未审批</a-tag>
+            case '1':
+              return <a-tag>通过</a-tag>
+            case '2':
+              return <a-tag>驳回</a-tag>
             default:
               return '- -'
           }
         }
       }, {
-        title: '上传人',
-        dataIndex: 'publisher',
+        title: '请假天数',
+        dataIndex: 'days',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '天'
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '创建时间',
+        dataIndex: 'createDate',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -187,26 +199,33 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.bulletinAdd.visiable = true
+      this.memberAdd.visiable = true
     },
-    handleBulletinAddClose () {
-      this.bulletinAdd.visiable = false
+    handlememberAddClose () {
+      this.memberAdd.visiable = false
     },
-    handleBulletinAddSuccess () {
-      this.bulletinAdd.visiable = false
-      this.$message.success('新增公告成功')
+    handlememberAddSuccess () {
+      this.memberAdd.visiable = false
+      this.$message.success('新增请假成功')
       this.search()
     },
     edit (record) {
-      this.$refs.bulletinEdit.setFormValues(record)
-      this.bulletinEdit.visiable = true
+      this.$refs.memberEdit.setFormValues(record)
+      this.memberEdit.visiable = true
     },
-    handleBulletinEditClose () {
-      this.bulletinEdit.visiable = false
+    memberViewOpen (row) {
+      this.memberView.data = row
+      this.memberView.visiable = true
     },
-    handleBulletinEditSuccess () {
-      this.bulletinEdit.visiable = false
-      this.$message.success('修改公告成功')
+    handlememberViewClose () {
+      this.memberView.visiable = false
+    },
+    handlememberEditClose () {
+      this.memberEdit.visiable = false
+    },
+    handlememberEditSuccess () {
+      this.memberEdit.visiable = false
+      this.$message.success('修改请假成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -224,7 +243,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/bulletin-info/' + ids).then(() => {
+          that.$delete('/cos/leave-teacher-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -294,7 +313,10 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      this.$get('/cos/bulletin-info/page', {
+      if (params.status === undefined) {
+        delete params.status
+      }
+      this.$get('/cos/leave-teacher-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

@@ -8,11 +8,11 @@
     <div style="font-size: 13px;font-family: SimHei" v-if="memberData !== null">
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">基础信息</span></a-col>
-        <a-col :span="8"><b>用户编号：</b>
-          {{ memberData.code ? memberData.code : '- -' }}
+        <a-col :span="8"><b>学生编号：</b>
+          {{ memberData.studentCode ? memberData.studentCode : '- -' }}
         </a-col>
-        <a-col :span="8"><b>用户名称：</b>
-          {{ memberData.name ? memberData.name : '- -' }}
+        <a-col :span="8"><b>用户姓名：</b>
+          {{ memberData.studentName ? memberData.studentName : '- -' }}
         </a-col>
         <a-col :span="8"><b>联系方式：</b>
           {{ memberData.phone }}
@@ -22,9 +22,6 @@
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col :span="8"><b>发送时间：</b>
           {{ memberData.createDate }}
-        </a-col>
-        <a-col :span="8"><b>邮箱地址：</b>
-          {{ memberData.email }}
         </a-col>
         <a-col :span="8"><b>消息状态：</b>
           <span v-if="memberData.status == 0">未读</span>

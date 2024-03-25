@@ -13,8 +13,7 @@
             fi.create_date,
             fi.price,
             ci.code as classCode,
-            ci.name as className,
-            ci.content
+            ci.name as className
         from
             fees_info fi
                 left join classes_info ci on

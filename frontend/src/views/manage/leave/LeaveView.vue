@@ -1,5 +1,5 @@
 <template>
-  <a-modal v-model="show" title="消息详情" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="教师请假详情" @cancel="onClose" :width="800">
     <template slot="footer">
       <a-button key="back" @click="onClose" type="danger">
         关闭
@@ -8,11 +8,11 @@
     <div style="font-size: 13px;font-family: SimHei" v-if="memberData !== null">
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">基础信息</span></a-col>
-        <a-col :span="8"><b>用户编号：</b>
-          {{ memberData.code ? memberData.code : '- -' }}
+        <a-col :span="8"><b>教师编号：</b>
+          {{ memberData.teacherCode ? memberData.teacherCode : '- -' }}
         </a-col>
-        <a-col :span="8"><b>用户名称：</b>
-          {{ memberData.name ? memberData.name : '- -' }}
+        <a-col :span="8"><b>教师姓名：</b>
+          {{ memberData.teacherName ? memberData.teacherName : '- -' }}
         </a-col>
         <a-col :span="8"><b>联系方式：</b>
           {{ memberData.phone }}
@@ -20,26 +20,44 @@
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>发送时间：</b>
+        <a-col :span="8"><b>创建时间：</b>
           {{ memberData.createDate }}
         </a-col>
-        <a-col :span="8"><b>邮箱地址：</b>
-          {{ memberData.email }}
+        <a-col :span="8"><b>请假天数：</b>
+          {{ memberData.days }} 天
         </a-col>
-        <a-col :span="8"><b>消息状态：</b>
-          <span v-if="memberData.status == 0">未读</span>
-          <span v-if="memberData.status == 1">已读</span>
+        <a-col :span="8"><b>审批状态：</b>
+          <span v-if="memberData.status == 0">未审批</span>
+          <span v-if="memberData.status == 1">通过</span>
+          <span v-if="memberData.status == 2">驳回</span>
         </a-col>
       </a-row>
       <br/>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">消息内容</span></a-col>
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">请加内容</span></a-col>
         <a-col :span="24">
-          {{ memberData.content ? memberData.content : '- -' }}
+          {{ memberData.auditTitle ? memberData.auditTitle : '- -' }}
         </a-col>
       </a-row>
       <br/>
+      <a-row style="padding-left: 24px;padding-right: 24px;">
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">图片</span></a-col>
+        <a-col :span="24">
+          <a-upload
+            name="avatar"
+            action="http://127.0.0.1:9527/file/fileUpload/"
+            list-type="picture-card"
+            :file-list="fileList"
+            @preview="handlePreview"
+            @change="picHandleChange"
+          >
+          </a-upload>
+          <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+            <img alt="example" style="width: 100%" :src="previewImage" />
+          </a-modal>
+        </a-col>
+      </a-row>
     </div>
   </a-modal>
 </template>

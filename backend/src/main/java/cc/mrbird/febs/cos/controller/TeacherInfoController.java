@@ -75,6 +75,7 @@ public class TeacherInfoController {
      */
     @PostMapping
     public R save(TeacherInfo teacherInfo) {
+        teacherInfo.setCode("TEA-" + System.currentTimeMillis());
         teacherInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         return R.ok(teacherInfoService.save(teacherInfo));
     }

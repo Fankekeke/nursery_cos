@@ -64,6 +64,7 @@ public class StudentInfoController {
      */
     @PostMapping
     public R save(StudentInfo studentInfo) {
+        studentInfo.setCode("STU-" + System.currentTimeMillis());
         studentInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         return R.ok(studentInfoService.save(studentInfo));
     }

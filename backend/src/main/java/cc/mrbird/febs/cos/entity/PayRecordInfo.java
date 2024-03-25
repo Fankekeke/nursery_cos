@@ -54,6 +54,11 @@ public class PayRecordInfo implements Serializable {
      */
     private String payDate;
 
+    /**
+     * 订单编号
+     */
+    private String code;
+
     @TableField(exist = false)
     private String studentName;
 

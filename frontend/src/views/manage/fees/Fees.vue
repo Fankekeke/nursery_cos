@@ -7,18 +7,26 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="标题"
+                label="缴费内容"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.title"/>
+                <a-input v-model="queryParams.name"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="内容"
+                label="班级编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.content"/>
+                <a-input v-model="queryParams.classCode"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="24">
+              <a-form-item
+                label="班级名称"
+                :labelCol="{span: 5}"
+                :wrapperCol="{span: 18, offset: 1}">
+                <a-input v-model="queryParams.className"/>
               </a-form-item>
             </a-col>
           </div>
@@ -62,7 +70,7 @@
               <template slot="title">
                 {{ record.content }}
               </template>
-              {{ record.content.slice(0, 40) }} ...
+              {{ record.content.slice(0, 20) }} ...
             </a-tooltip>
           </template>
         </template>
@@ -71,39 +79,39 @@
         </template>
       </a-table>
     </div>
-    <bulletin-add
-      v-if="bulletinAdd.visiable"
-      @close="handleBulletinAddClose"
-      @success="handleBulletinAddSuccess"
-      :bulletinAddVisiable="bulletinAdd.visiable">
-    </bulletin-add>
-    <bulletin-edit
-      ref="bulletinEdit"
-      @close="handleBulletinEditClose"
-      @success="handleBulletinEditSuccess"
-      :bulletinEditVisiable="bulletinEdit.visiable">
-    </bulletin-edit>
+    <fees-add
+      v-if="feesAdd.visiable"
+      @close="handlefeesAddClose"
+      @success="handlefeesAddSuccess"
+      :feesAddVisiable="feesAdd.visiable">
+    </fees-add>
+    <fees-edit
+      ref="feesEdit"
+      @close="handlefeesEditClose"
+      @success="handlefeesEditSuccess"
+      :feesEditVisiable="feesEdit.visiable">
+    </fees-edit>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
-import BulletinAdd from './BulletinAdd'
-import BulletinEdit from './BulletinEdit'
+import feesAdd from './FeesAdd.vue'
+import feesEdit from './FeesEdit.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'Bulletin',
-  components: {BulletinAdd, BulletinEdit, RangeDate},
+  name: 'fees',
+  components: {feesAdd, feesEdit, RangeDate},
   data () {
     return {
       advanced: false,
-      bulletinAdd: {
+      feesAdd: {
         visiable: false
       },
-      bulletinEdit: {
+      feesEdit: {
         visiable: false
       },
       queryParams: {},
@@ -130,15 +138,15 @@ export default {
     }),
     columns () {
       return [{
-        title: '标题',
-        dataIndex: 'title'
+        title: '缴费内容',
+        dataIndex: 'name'
       }, {
-        title: '公告内容',
+        title: '备注',
         dataIndex: 'content',
         scopedSlots: { customRender: 'contentShow' }
       }, {
-        title: '发布时间',
-        dataIndex: 'date',
+        title: '创建时间',
+        dataIndex: 'createDate',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -147,24 +155,41 @@ export default {
           }
         }
       }, {
-        title: '上下架',
-        dataIndex: 'type',
-        customRender: (text, row, index) => {
-          switch (text) {
-            case 1:
-              return <a-tag>上架</a-tag>
-            case 2:
-              return <a-tag>下架</a-tag>
-            default:
-              return '- -'
-          }
-        }
-      }, {
-        title: '上传人',
-        dataIndex: 'publisher',
+        title: '创建人',
+        dataIndex: 'createBy',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '价格',
+        dataIndex: 'price',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '班级编号',
+        dataIndex: 'classCode',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '班级名称',
+        dataIndex: 'className',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
           } else {
             return '- -'
           }
@@ -187,26 +212,26 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.bulletinAdd.visiable = true
+      this.feesAdd.visiable = true
     },
-    handleBulletinAddClose () {
-      this.bulletinAdd.visiable = false
+    handlefeesAddClose () {
+      this.feesAdd.visiable = false
     },
-    handleBulletinAddSuccess () {
-      this.bulletinAdd.visiable = false
-      this.$message.success('新增公告成功')
+    handlefeesAddSuccess () {
+      this.feesAdd.visiable = false
+      this.$message.success('新增缴费内容成功')
       this.search()
     },
     edit (record) {
-      this.$refs.bulletinEdit.setFormValues(record)
-      this.bulletinEdit.visiable = true
+      this.$refs.feesEdit.setFormValues(record)
+      this.feesEdit.visiable = true
     },
-    handleBulletinEditClose () {
-      this.bulletinEdit.visiable = false
+    handlefeesEditClose () {
+      this.feesEdit.visiable = false
     },
-    handleBulletinEditSuccess () {
-      this.bulletinEdit.visiable = false
-      this.$message.success('修改公告成功')
+    handlefeesEditSuccess () {
+      this.feesEdit.visiable = false
+      this.$message.success('修改缴费内容成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -224,7 +249,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/bulletin-info/' + ids).then(() => {
+          that.$delete('/cos/fees-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -294,7 +319,7 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      this.$get('/cos/bulletin-info/page', {
+      this.$get('/cos/fees-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

@@ -7,18 +7,18 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="用户名称"
+                label="学生姓名"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.name"/>
+                <a-input v-model="queryParams.studentName"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="用户编号"
+                label="学生编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.userCode"/>
+                <a-input v-model="queryParams.studentCode"/>
               </a-form-item>
             </a-col>
           </div>
@@ -114,8 +114,8 @@ export default {
           }
         }
       }, {
-        title: '用户名称',
-        dataIndex: 'name',
+        title: '学生姓名',
+        dataIndex: 'studentName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -124,20 +124,20 @@ export default {
           }
         }
       }, {
-        title: '用户头像',
-        dataIndex: 'images',
+        title: '学生头像',
+        dataIndex: 'studentImages',
         customRender: (text, record, index) => {
-          if (!record.images) return <a-avatar shape="square" icon="user" />
+          if (!record.studentImages) return <a-avatar shape="square" icon="user" />
           return <a-popover>
             <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
             </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
           </a-popover>
         }
       }, {
-        title: '联系方式',
-        dataIndex: 'phone',
+        title: '缴费内容',
+        dataIndex: 'feesName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -146,11 +146,11 @@ export default {
           }
         }
       }, {
-        title: '会员名称',
-        dataIndex: 'memberName',
+        title: '缴费金额',
+        dataIndex: 'price',
         customRender: (text, row, index) => {
           if (text !== null) {
-            return text
+            return text + '元'
           } else {
             return '- -'
           }
@@ -161,21 +161,11 @@ export default {
         customRender: (text, row, index) => {
           switch (text) {
             case '0':
-              return <a-tag color="red">未支付</a-tag>
+              return <a-tag color="red">未缴费</a-tag>
             case '1':
-              return <a-tag color="green">已支付</a-tag>
+              return <a-tag color="green">已缴费</a-tag>
             default:
               return '- -'
-          }
-        }
-      }, {
-        title: '价格',
-        dataIndex: 'price',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
           }
         }
       }, {
@@ -250,7 +240,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/member-record-info/' + ids).then(() => {
+          that.$delete('/cos/pay-record-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -323,7 +313,7 @@ export default {
       if (params.delFlag === undefined) {
         delete params.delFlag
       }
-      this.$get('/cos/member-record-info/page', {
+      this.$get('/cos/pay-record-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

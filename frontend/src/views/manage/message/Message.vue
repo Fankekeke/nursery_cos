@@ -7,18 +7,18 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="用户名称"
+                label="学生姓名"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.name"/>
+                <a-input v-model="queryParams.studentName"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="用户名称"
+                label="学生编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.code"/>
+                <a-input v-model="queryParams.studentCode"/>
               </a-form-item>
             </a-col>
           </div>
@@ -114,11 +114,11 @@ export default {
     }),
     columns () {
       return [ {
-        title: '用户编号',
-        dataIndex: 'code'
+        title: '学生编号',
+        dataIndex: 'studentCode'
       }, {
-        title: '用户名称',
-        dataIndex: 'name',
+        title: '学生姓名',
+        dataIndex: 'studentName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -127,15 +127,15 @@ export default {
           }
         }
       }, {
-        title: '用户头像',
-        dataIndex: 'images',
+        title: '头像',
+        dataIndex: 'studentImages',
         customRender: (text, record, index) => {
-          if (!record.images) return <a-avatar shape="square" icon="user" />
+          if (!record.studentImages) return <a-avatar shape="square" icon="user" />
           return <a-popover>
             <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
             </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
           </a-popover>
         }
       }, {

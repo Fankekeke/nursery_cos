@@ -1,5 +1,5 @@
 <template>
-  <a-modal v-model="show" title="新增公告" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="新增缴费内容" @cancel="onClose" :width="800">
     <template slot="footer">
       <a-button key="back" @click="onClose">
         取消
@@ -11,60 +11,45 @@
     <a-form :form="form" layout="vertical">
       <a-row :gutter="20">
         <a-col :span="12">
-          <a-form-item label='公告标题' v-bind="formItemLayout">
+          <a-form-item label='缴费内容' v-bind="formItemLayout">
             <a-input v-decorator="[
-            'title',
-            { rules: [{ required: true, message: '请输入名称!' }] }
+            'name',
+            { rules: [{ required: true, message: '请输入缴费内容!' }] }
             ]"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='上传人' v-bind="formItemLayout">
+          <a-form-item label='发布人' v-bind="formItemLayout">
             <a-input v-decorator="[
-            'publisher',
-            { rules: [{ required: true, message: '请输入上传人!' }] }
+            'createBy',
+            { rules: [{ required: true, message: '请输入发布人!' }] }
             ]"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='上下架' v-bind="formItemLayout">
+          <a-form-item label='所属班级' v-bind="formItemLayout">
             <a-select v-decorator="[
-              'type',
-              { rules: [{ required: true, message: '请输入上下架!' }] }
+              'classId',
+              { rules: [{ required: true, message: '请输入所属班级!' }] }
               ]">
-              <a-select-option value="1">上架</a-select-option>
-              <a-select-option value="2">下架</a-select-option>
+              <a-select-option :value="item.id" v-for="(item, index) in classesList" :key="index">{{ item.name }}</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
+        <a-col :span="12">
+          <a-form-item label='价格' v-bind="formItemLayout">
+            <a-input-number :min="1" v-decorator="[
+              'price',
+              { rules: [{ required: true, message: '请输入价格!' }] }
+              ]" style="width: 100%"/>
+          </a-form-item>
+        </a-col>
         <a-col :span="24">
-          <a-form-item label='公告内容' v-bind="formItemLayout">
+          <a-form-item label='备注' v-bind="formItemLayout">
             <a-textarea :rows="6" v-decorator="[
             'content',
              { rules: [{ required: true, message: '请输入名称!' }] }
             ]"/>
-          </a-form-item>
-        </a-col>
-        <a-col :span="24">
-          <a-form-item label='图册' v-bind="formItemLayout">
-            <a-upload
-              name="avatar"
-              action="http://127.0.0.1:9527/file/fileUpload/"
-              list-type="picture-card"
-              :file-list="fileList"
-              @preview="handlePreview"
-              @change="picHandleChange"
-            >
-              <div v-if="fileList.length < 8">
-                <a-icon type="plus" />
-                <div class="ant-upload-text">
-                  Upload
-                </div>
-              </div>
-            </a-upload>
-            <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-              <img alt="example" style="width: 100%" :src="previewImage" />
-            </a-modal>
           </a-form-item>
         </a-col>
       </a-row>
@@ -87,9 +72,9 @@ const formItemLayout = {
   wrapperCol: { span: 24 }
 }
 export default {
-  name: 'BulletinAdd',
+  name: 'feesAdd',
   props: {
-    bulletinAddVisiable: {
+    feesAddVisiable: {
       default: false
     }
   },
@@ -99,7 +84,7 @@ export default {
     }),
     show: {
       get: function () {
-        return this.bulletinAddVisiable
+        return this.feesAddVisiable
       },
       set: function () {
       }
@@ -111,11 +96,20 @@ export default {
       form: this.$form.createForm(this),
       loading: false,
       fileList: [],
+      classesList: [],
       previewVisible: false,
       previewImage: ''
     }
   },
+  mounted () {
+    this.selectClassesList()
+  },
   methods: {
+    selectClassesList () {
+      this.$get('/cos/classes-info/list').then((r) => {
+        this.classesList = r.data.data
+      })
+    },
     handleCancel () {
       this.previewVisible = false
     },
@@ -147,7 +141,7 @@ export default {
         values.images = images.length > 0 ? images.join(',') : null
         if (!err) {
           this.loading = true
-          this.$post('/cos/bulletin-info', {
+          this.$post('/cos/fees-info', {
             ...values
           }).then((r) => {
             this.reset()

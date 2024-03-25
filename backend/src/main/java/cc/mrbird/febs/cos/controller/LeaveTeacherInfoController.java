@@ -64,6 +64,7 @@ public class LeaveTeacherInfoController {
      */
     @PostMapping
     public R save(LeaveTeacherInfo leaveTeacherInfo) {
+        leaveTeacherInfo.setStatus("0");
         leaveTeacherInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         return R.ok(leaveTeacherInfoService.save(leaveTeacherInfo));
     }

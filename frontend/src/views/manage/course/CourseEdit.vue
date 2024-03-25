@@ -1,5 +1,5 @@
 <template>
-  <a-modal v-model="show" title="修改公告" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="修改课程" @cancel="onClose" :width="800">
     <template slot="footer">
       <a-button key="back" @click="onClose">
         取消
@@ -11,60 +11,29 @@
     <a-form :form="form" layout="vertical">
       <a-row :gutter="20">
         <a-col :span="12">
-          <a-form-item label='公告标题' v-bind="formItemLayout">
+          <a-form-item label='课程名称' v-bind="formItemLayout">
             <a-input v-decorator="[
-            'title',
-            { rules: [{ required: true, message: '请输入名称!' }] }
+            'courseName',
+            { rules: [{ required: true, message: '请输入课程名称!' }] }
             ]"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='上传人' v-bind="formItemLayout">
-            <a-input v-decorator="[
-            'publisher',
-            { rules: [{ required: true, message: '请输入上传人!' }] }
-            ]"/>
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label='上下架' v-bind="formItemLayout">
+          <a-form-item label='负责老师' v-bind="formItemLayout">
             <a-select v-decorator="[
-              'type',
-              { rules: [{ required: true, message: '请输入上下架!' }] }
+              'teacherId',
+              { rules: [{ required: true, message: '请输入负责老师!' }] }
               ]">
-              <a-select-option value="1">上架</a-select-option>
-              <a-select-option value="2">下架</a-select-option>
+              <a-select-option :value="item.id" v-for="(item, index) in teacherList" :key="index">{{ item.name }}</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
         <a-col :span="24">
-          <a-form-item label='公告内容' v-bind="formItemLayout">
+          <a-form-item label='课程内容' v-bind="formItemLayout">
             <a-textarea :rows="6" v-decorator="[
             'content',
              { rules: [{ required: true, message: '请输入名称!' }] }
             ]"/>
-          </a-form-item>
-        </a-col>
-        <a-col :span="24">
-          <a-form-item label='图册' v-bind="formItemLayout">
-            <a-upload
-              name="avatar"
-              action="http://127.0.0.1:9527/file/fileUpload/"
-              list-type="picture-card"
-              :file-list="fileList"
-              @preview="handlePreview"
-              @change="picHandleChange"
-            >
-              <div v-if="fileList.length < 8">
-                <a-icon type="plus" />
-                <div class="ant-upload-text">
-                  Upload
-                </div>
-              </div>
-            </a-upload>
-            <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-              <img alt="example" style="width: 100%" :src="previewImage" />
-            </a-modal>
           </a-form-item>
         </a-col>
       </a-row>
@@ -87,9 +56,9 @@ const formItemLayout = {
   wrapperCol: { span: 24 }
 }
 export default {
-  name: 'BulletinEdit',
+  name: 'courseEdit',
   props: {
-    bulletinEditVisiable: {
+    courseEditVisiable: {
       default: false
     }
   },
@@ -99,7 +68,7 @@ export default {
     }),
     show: {
       get: function () {
-        return this.bulletinEditVisiable
+        return this.courseEditVisiable
       },
       set: function () {
       }
@@ -112,11 +81,20 @@ export default {
       form: this.$form.createForm(this),
       loading: false,
       fileList: [],
+      teacherList: [],
       previewVisible: false,
       previewImage: ''
     }
   },
+  mounted () {
+    this.selectTeacherList()
+  },
   methods: {
+    selectTeacherList () {
+      this.$get('/cos/teacher-info/list/check').then((r) => {
+        this.teacherList = r.data.data
+      })
+    },
     handleCancel () {
       this.previewVisible = false
     },
@@ -139,21 +117,21 @@ export default {
         this.fileList = imageList
       }
     },
-    setFormValues ({...bulletin}) {
-      this.rowId = bulletin.id
-      let fields = ['title', 'content', 'publisher', 'rackUp', 'type']
+    setFormValues ({...course}) {
+      this.rowId = course.id
+      let fields = ['courseName', 'content', 'teacherId']
       let obj = {}
-      Object.keys(bulletin).forEach((key) => {
+      Object.keys(course).forEach((key) => {
         if (key === 'images') {
           this.fileList = []
-          this.imagesInit(bulletin['images'])
+          this.imagesInit(course['images'])
         }
-        if (key === 'type' && bulletin[key] != null) {
-          bulletin[key] = bulletin[key].toString()
+        if (key === 'teacherId' && course[key] != null) {
+          course[key] = course[key].toString()
         }
         if (fields.indexOf(key) !== -1) {
           this.form.getFieldDecorator(key)
-          obj[key] = bulletin[key]
+          obj[key] = course[key]
         }
       })
       this.form.setFieldsValue(obj)
@@ -181,7 +159,7 @@ export default {
         values.images = images.length > 0 ? images.join(',') : null
         if (!err) {
           this.loading = true
-          this.$put('/cos/bulletin-info', {
+          this.$put('/cos/course-info', {
             ...values
           }).then((r) => {
             this.reset()

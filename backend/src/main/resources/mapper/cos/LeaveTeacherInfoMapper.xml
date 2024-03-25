@@ -13,6 +13,7 @@
         li.images,
         li.teacher_id,
         li.audit_date,
+        ti.code as teacherCode,
         ti.name as teacherName,
         ti.images as teacherImages,
         ti.phone

@@ -21,8 +21,8 @@
                 (ti.id = ci.teacher_id)
         where
             1 = 1
-        <if test="courseInfo.code != null and courseInfo.code != ''">
-            AND ci.course_name LIKE CONCAT('%',#{courseInfo.code},'%')
+        <if test="courseInfo.courseName != null and courseInfo.courseName != ''">
+            AND ci.course_name LIKE CONCAT('%',#{courseInfo.courseName},'%')
         </if>
         <if test="courseInfo.code != null and courseInfo.code != ''">
             AND ci.code LIKE CONCAT('%',#{courseInfo.code},'%')

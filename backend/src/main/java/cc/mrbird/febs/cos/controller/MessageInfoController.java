@@ -64,6 +64,7 @@ public class MessageInfoController {
      */
     @PostMapping
     public R save(MessageInfo messageInfo) {
+        messageInfo.setStatus("0");
         messageInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         return R.ok(messageInfoService.save(messageInfo));
     }

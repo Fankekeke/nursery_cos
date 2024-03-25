@@ -64,6 +64,8 @@ public class PayRecordInfoController {
      */
     @PostMapping
     public R save(PayRecordInfo payRecordInfo) {
+        payRecordInfo.setCode("RE-" + System.currentTimeMillis());
+        payRecordInfo.setStatus("0");
         payRecordInfo.setPayDate(DateUtil.formatDateTime(new Date()));
         return R.ok(payRecordInfoService.save(payRecordInfo));
     }
