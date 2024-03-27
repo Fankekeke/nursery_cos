@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -77,6 +78,9 @@ public class StudentInfo implements Serializable {
      * 所属账户
      */
     private Integer userId;
+
+    @TableField(exist = false)
+    private Integer teacherId;
 
 
 }

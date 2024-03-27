@@ -126,9 +126,9 @@ export default {
           this.fileList = []
           this.imagesInit(course['images'])
         }
-        if (key === 'teacherId' && course[key] != null) {
-          course[key] = course[key].toString()
-        }
+        // if (key === 'teacherId' && course[key] != null) {
+        //   course[key] = course[key].toString()
+        // }
         if (fields.indexOf(key) !== -1) {
           this.form.getFieldDecorator(key)
           obj[key] = course[key]

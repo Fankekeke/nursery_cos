@@ -22,16 +22,16 @@
               <a-col :span="4"></a-col>
               <a-col :span="4"></a-col>
               <a-col :span="4">
-                <head-info title="车辆数量" :content="titleData.staffNum" :center="false" :bordered="false"/>
+                <head-info title="学生数量" :content="titleData.staffNum" :center="false" :bordered="false"/>
               </a-col>
               <a-col :span="4">
                 <head-info title="总收益" :content="titleData.totalRevenue" :center="false" :bordered="false"/>
               </a-col>
               <a-col :span="4">
-                <head-info title="客户数量" :content="titleData.totalOrderNum" :center="false" :bordered="false"/>
+                <head-info title="班级数量" :content="titleData.totalOrderNum" :center="false" :bordered="false"/>
               </a-col>
               <a-col :span="4">
-                <head-info title="车位数量" :content="titleData.roomNum" :center="false"/>
+                <head-info title="教师数量" :content="titleData.roomNum" :center="false"/>
               </a-col>
             </a-row>
           </div>

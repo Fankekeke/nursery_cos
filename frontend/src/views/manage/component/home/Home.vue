@@ -277,7 +277,7 @@ export default {
   },
   methods: {
     selectHomeData () {
-      this.$get('/cos/park-order-info/home/data', {roleId: this.user.roleId, userId: this.user.userId}).then((r) => {
+      this.$get('/cos/fees-info/home/data', {roleId: this.user.roleId, userId: this.user.userId}).then((r) => {
         let titleData = { staffNum: r.data.staffNum, totalRevenue: r.data.totalRevenue, totalOrderNum: r.data.totalOrderNum, roomNum: r.data.roomNum }
         this.$emit('setTitle', titleData)
         this.titleData.incomeMonth = r.data.incomeMonth

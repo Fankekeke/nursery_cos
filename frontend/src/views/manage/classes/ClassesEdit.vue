@@ -128,15 +128,17 @@ export default {
           this.fileList = []
           this.imagesInit(classes['images'])
         }
-        if (key === 'teacherId') {
-          classes[key] = classes[key].toString()
-        }
+        // if (key === 'teacherId') {
+        //   classes[key] = classes[key].toString()
+        // }
         if (fields.indexOf(key) !== -1) {
           this.form.getFieldDecorator(key)
           obj[key] = classes[key]
         }
       })
-      this.form.setFieldsValue(obj)
+      setTimeout(() => {
+        this.form.setFieldsValue(obj)
+      }, 200)
     },
     reset () {
       this.loading = false

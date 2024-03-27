@@ -1,46 +1,46 @@
 <template>
-  <a-modal v-model="show" title="班级详情" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="学生详情" @cancel="onClose" :width="800">
     <template slot="footer">
       <a-button key="back" @click="onClose" type="danger">
         关闭
       </a-button>
     </template>
-    <div style="font-size: 13px;font-family: SimHei" v-if="classesData !== null">
+    <div style="font-size: 13px;font-family: SimHei" v-if="studentData !== null">
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">班级信息</span></a-col>
-        <a-col :span="8"><b>班级编号：</b>
-          {{ classesData.code ? classesData.code : '- -' }}
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">学生信息</span></a-col>
+        <a-col :span="8"><b>学生编号：</b>
+          {{ studentData.code ? studentData.code : '- -' }}
         </a-col>
-        <a-col :span="8"><b>班级名称：</b>
-          {{ classesData.name ? classesData.name : '- -' }}
+        <a-col :span="8"><b>学生姓名：</b>
+          {{ studentData.name ? studentData.name : '- -' }}
         </a-col>
-        <a-col :span="8"><b>创建时间：</b>
-          {{ classesData.createDate }}
+        <a-col :span="8"><b>联系方式：</b>
+          {{ studentData.phone }}
         </a-col>
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>教师名称：</b>
-          {{ classesData.teacherName }}
+        <a-col :span="8"><b>出生日期：</b>
+          {{ studentData.birthday }}
         </a-col>
-        <a-col :span="8"><b>教师编号：</b>
-          {{ classesData.teacherCode }}
+        <a-col :span="8"><b>创建时间：</b>
+          {{ studentData.createDate }}
         </a-col>
         <a-col :span="8"><b>性别：</b>
-          <span v-if="classesData.sex == 1">男</span>
-          <span v-if="classesData.sex == 2">女</span>
+          <span v-if="studentData.sex == 1">男</span>
+          <span v-if="studentData.sex == 2">女</span>
         </a-col>
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col :span="24"><b>备注：</b>
-          {{ classesData.content }}
+          {{ studentData.content }}
         </a-col>
       </a-row>
       <br/>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">教师头像</span></a-col>
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">学生头像</span></a-col>
         <a-col :span="24">
           <a-upload
             name="avatar"
@@ -76,18 +76,18 @@ function getBase64 (file) {
 export default {
   name: 'userView',
   props: {
-    classesShow: {
+    studentShow: {
       type: Boolean,
       default: false
     },
-    classesData: {
+    studentData: {
       type: Object
     }
   },
   computed: {
     show: {
       get: function () {
-        return this.classesShow
+        return this.studentShow
       },
       set: function () {
       }
@@ -106,20 +106,20 @@ export default {
     }
   },
   watch: {
-    classesShow: function (value) {
+    studentShow: function (value) {
       if (value) {
-        if (this.classesData.images) {
-          this.imagesInit(this.classesData.images)
+        if (this.studentData.images) {
+          this.imagesInit(this.studentData.images)
         }
       }
     }
   },
   methods: {
-    local (classesData) {
+    local (studentData) {
       baiduMap.clearOverlays()
       baiduMap.rMap().enableScrollWheelZoom(true)
       // eslint-disable-next-line no-undef
-      let point = new BMap.Point(classesData.longitude, classesData.latitude)
+      let point = new BMap.Point(studentData.longitude, studentData.latitude)
       baiduMap.pointAdd(point)
       baiduMap.findPoint(point, 16)
       // let driving = new BMap.DrivingRoute(baiduMap.rMap(), {renderOptions:{map: baiduMap.rMap(), autoViewport: true}});

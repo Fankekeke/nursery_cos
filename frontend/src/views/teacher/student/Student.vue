@@ -7,7 +7,7 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="班级编号"
+                label="学生编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
                 <a-input v-model="queryParams.code"/>
@@ -15,18 +15,10 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="班级名称"
+                label="学生姓名"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
                 <a-input v-model="queryParams.name"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="教师名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.teacherName"/>
               </a-form-item>
             </a-col>
           </div>
@@ -39,8 +31,8 @@
     </div>
     <div>
       <div class="operator">
-        <a-button type="primary" ghost @click="add">新增</a-button>
-        <a-button @click="batchDelete">删除</a-button>
+<!--        <a-button type="primary" ghost @click="add">新增</a-button>-->
+<!--        <a-button @click="batchDelete">删除</a-button>-->
       </div>
       <!-- 表格区域 -->
       <a-table ref="TableInfo"
@@ -70,58 +62,58 @@
               <template slot="title">
                 {{ record.content }}
               </template>
-              {{ record.content.slice(0, 20) }} ...
+              {{ record.content.slice(0, 40) }} ...
             </a-tooltip>
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
           <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
-          <a-icon type="file-search" @click="classesViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
+          <a-icon type="file-search" @click="studentViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
-    <classes-add
-      v-if="classesAdd.visiable"
-      @close="handleclassesAddClose"
-      @success="handleclassesAddSuccess"
-      :classesAddVisiable="classesAdd.visiable">
-    </classes-add>
-    <classes-edit
-      ref="classesEdit"
-      @close="handleclassesEditClose"
-      @success="handleclassesEditSuccess"
-      :classesEditVisiable="classesEdit.visiable">
-    </classes-edit>
-    <classes-view
-      @close="handleclassesViewClose"
-      :classesShow="classesView.visiable"
-      :classesData="classesView.data">
-    </classes-view>
+    <student-add
+      v-if="studentAdd.visiable"
+      @close="handlestudentAddClose"
+      @success="handlestudentAddSuccess"
+      :studentAddVisiable="studentAdd.visiable">
+    </student-add>
+    <student-edit
+      ref="studentEdit"
+      @close="handlestudentEditClose"
+      @success="handlestudentEditSuccess"
+      :studentEditVisiable="studentEdit.visiable">
+    </student-edit>
+    <student-view
+      @close="handlestudentViewClose"
+      :studentShow="studentView.visiable"
+      :studentData="studentView.data">
+    </student-view>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
-import classesView from './ClassesView.vue'
-import classesAdd from './ClassesAdd.vue'
-import classesEdit from './ClassesEdit.vue'
+import studentView from './StudentView.vue'
+import studentAdd from './StudentAdd.vue'
+import studentEdit from './StudentEdit.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'classes',
-  components: {classesAdd, classesEdit, RangeDate, classesView},
+  name: 'student',
+  components: {studentAdd, studentEdit, RangeDate, studentView},
   data () {
     return {
       advanced: false,
-      classesAdd: {
+      studentAdd: {
         visiable: false
       },
-      classesEdit: {
+      studentEdit: {
         visiable: false
       },
-      classesView: {
+      studentView: {
         visiable: false,
         data: null
       },
@@ -149,10 +141,10 @@ export default {
     }),
     columns () {
       return [{
-        title: '班级编号',
+        title: '学生编号',
         dataIndex: 'code'
       }, {
-        title: '班级名称',
+        title: '学生姓名',
         dataIndex: 'name',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -162,9 +154,15 @@ export default {
           }
         }
       }, {
-        title: '备注',
-        dataIndex: 'content',
-        scopedSlots: {customRender: 'contentShow'}
+        title: '出生日期',
+        dataIndex: 'birthday',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
       }, {
         title: '性别',
         dataIndex: 'sex',
@@ -179,27 +177,7 @@ export default {
           }
         }
       }, {
-        title: '教师编号',
-        dataIndex: 'teacherCode',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '教师名称',
-        dataIndex: 'teacherName',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '教师头像',
+        title: '学生头像',
         dataIndex: 'images',
         customRender: (text, record, index) => {
           if (!record.images) return <a-avatar shape="square" icon="user" />
@@ -211,8 +189,18 @@ export default {
           </a-popover>
         }
       }, {
-        title: '创建时间',
-        dataIndex: 'createDate',
+        title: '联系方式',
+        dataIndex: 'phone',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '所属班级',
+        dataIndex: 'className',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -231,12 +219,12 @@ export default {
     this.fetch()
   },
   methods: {
-    classesViewOpen (row) {
-      this.classesView.data = row
-      this.classesView.visiable = true
+    studentViewOpen (row) {
+      this.studentView.data = row
+      this.studentView.visiable = true
     },
-    handleclassesViewClose () {
-      this.classesView.visiable = false
+    handlestudentViewClose () {
+      this.studentView.visiable = false
     },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
@@ -245,26 +233,26 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.classesAdd.visiable = true
+      this.studentAdd.visiable = true
     },
-    handleclassesAddClose () {
-      this.classesAdd.visiable = false
+    handlestudentAddClose () {
+      this.studentAdd.visiable = false
     },
-    handleclassesAddSuccess () {
-      this.classesAdd.visiable = false
-      this.$message.success('新增班级成功')
+    handlestudentAddSuccess () {
+      this.studentAdd.visiable = false
+      this.$message.success('新增学生成功')
       this.search()
     },
     edit (record) {
-      this.$refs.classesEdit.setFormValues(record)
-      this.classesEdit.visiable = true
+      this.$refs.studentEdit.setFormValues(record)
+      this.studentEdit.visiable = true
     },
-    handleclassesEditClose () {
-      this.classesEdit.visiable = false
+    handlestudentEditClose () {
+      this.studentEdit.visiable = false
     },
-    handleclassesEditSuccess () {
-      this.classesEdit.visiable = false
-      this.$message.success('修改班级成功')
+    handlestudentEditSuccess () {
+      this.studentEdit.visiable = false
+      this.$message.success('修改学生成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -282,7 +270,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/classes-info/' + ids).then(() => {
+          that.$delete('/cos/student-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -352,7 +340,8 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      this.$get('/cos/classes-info/page', {
+      params.teacherId = this.currentUser.userId
+      this.$get('/cos/student-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

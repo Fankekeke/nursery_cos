@@ -30,6 +30,9 @@
         <if test="courseInfo.teacherName != null and courseInfo.teacherName != ''">
             AND ti.name LIKE CONCAT('%',#{courseInfo.teacherName},'%')
         </if>
+        <if test="courseInfo.teacherId != null and courseInfo.teacherId != ''">
+            AND ti.user_id = #{courseInfo.teacherId}
+        </if>
         order by
             ci.create_date desc
 

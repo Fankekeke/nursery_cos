@@ -4,6 +4,7 @@ package cc.mrbird.febs.cos.controller;
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.TeacherInfo;
 import cc.mrbird.febs.cos.service.ITeacherInfoService;
+import cc.mrbird.febs.system.service.UserService;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,6 +24,8 @@ import java.util.List;
 public class TeacherInfoController {
 
     private final ITeacherInfoService teacherInfoService;
+
+    private final UserService userService;
 
     /**
      * 分页获取教师信息
@@ -74,10 +77,11 @@ public class TeacherInfoController {
      * @return 结果
      */
     @PostMapping
-    public R save(TeacherInfo teacherInfo) {
+    public R save(TeacherInfo teacherInfo) throws Exception {
         teacherInfo.setCode("TEA-" + System.currentTimeMillis());
         teacherInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
-        return R.ok(teacherInfoService.save(teacherInfo));
+        userService.registTeacher(teacherInfo.getCode(), "1234qwer", teacherInfo);
+        return R.ok(true);
     }
 
     /**

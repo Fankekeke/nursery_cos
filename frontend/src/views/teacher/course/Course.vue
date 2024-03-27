@@ -7,18 +7,18 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="班级编号"
+                label="课程名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.code"/>
+                <a-input v-model="queryParams.courseName"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="班级名称"
+                label="课程编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.name"/>
+                <a-input v-model="queryParams.code"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
@@ -39,8 +39,8 @@
     </div>
     <div>
       <div class="operator">
-        <a-button type="primary" ghost @click="add">新增</a-button>
-        <a-button @click="batchDelete">删除</a-button>
+<!--        <a-button type="primary" ghost @click="add">新增</a-button>-->
+<!--        <a-button @click="batchDelete">删除</a-button>-->
       </div>
       <!-- 表格区域 -->
       <a-table ref="TableInfo"
@@ -70,60 +70,49 @@
               <template slot="title">
                 {{ record.content }}
               </template>
-              {{ record.content.slice(0, 20) }} ...
+              {{ record.content.slice(0, 40) }} ...
             </a-tooltip>
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
           <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
-          <a-icon type="file-search" @click="classesViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
-    <classes-add
-      v-if="classesAdd.visiable"
-      @close="handleclassesAddClose"
-      @success="handleclassesAddSuccess"
-      :classesAddVisiable="classesAdd.visiable">
-    </classes-add>
-    <classes-edit
-      ref="classesEdit"
-      @close="handleclassesEditClose"
-      @success="handleclassesEditSuccess"
-      :classesEditVisiable="classesEdit.visiable">
-    </classes-edit>
-    <classes-view
-      @close="handleclassesViewClose"
-      :classesShow="classesView.visiable"
-      :classesData="classesView.data">
-    </classes-view>
+    <course-add
+      v-if="courseAdd.visiable"
+      @close="handlecourseAddClose"
+      @success="handlecourseAddSuccess"
+      :courseAddVisiable="courseAdd.visiable">
+    </course-add>
+    <course-edit
+      ref="courseEdit"
+      @close="handlecourseEditClose"
+      @success="handlecourseEditSuccess"
+      :courseEditVisiable="courseEdit.visiable">
+    </course-edit>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
-import classesView from './ClassesView.vue'
-import classesAdd from './ClassesAdd.vue'
-import classesEdit from './ClassesEdit.vue'
+import courseAdd from './CourseAdd.vue'
+import courseEdit from './CourseEdit.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'classes',
-  components: {classesAdd, classesEdit, RangeDate, classesView},
+  name: 'course',
+  components: {courseAdd, courseEdit, RangeDate},
   data () {
     return {
       advanced: false,
-      classesAdd: {
+      courseAdd: {
         visiable: false
       },
-      classesEdit: {
+      courseEdit: {
         visiable: false
-      },
-      classesView: {
-        visiable: false,
-        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -149,11 +138,11 @@ export default {
     }),
     columns () {
       return [{
-        title: '班级编号',
+        title: '课程编号',
         dataIndex: 'code'
       }, {
-        title: '班级名称',
-        dataIndex: 'name',
+        title: '课程名称',
+        dataIndex: 'courseName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -162,34 +151,11 @@ export default {
           }
         }
       }, {
-        title: '备注',
+        title: '课程内容',
         dataIndex: 'content',
-        scopedSlots: {customRender: 'contentShow'}
+        scopedSlots: { customRender: 'contentShow' }
       }, {
-        title: '性别',
-        dataIndex: 'sex',
-        customRender: (text, row, index) => {
-          switch (text) {
-            case '1':
-              return <a-tag>男</a-tag>
-            case '2':
-              return <a-tag>女</a-tag>
-            default:
-              return '- -'
-          }
-        }
-      }, {
-        title: '教师编号',
-        dataIndex: 'teacherCode',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '教师名称',
+        title: '负责教师',
         dataIndex: 'teacherName',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -209,6 +175,16 @@ export default {
             </template>
             <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
           </a-popover>
+        }
+      }, {
+        title: '联系方式',
+        dataIndex: 'phone',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
         }
       }, {
         title: '创建时间',
@@ -231,13 +207,6 @@ export default {
     this.fetch()
   },
   methods: {
-    classesViewOpen (row) {
-      this.classesView.data = row
-      this.classesView.visiable = true
-    },
-    handleclassesViewClose () {
-      this.classesView.visiable = false
-    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
@@ -245,26 +214,26 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.classesAdd.visiable = true
+      this.courseAdd.visiable = true
     },
-    handleclassesAddClose () {
-      this.classesAdd.visiable = false
+    handlecourseAddClose () {
+      this.courseAdd.visiable = false
     },
-    handleclassesAddSuccess () {
-      this.classesAdd.visiable = false
-      this.$message.success('新增班级成功')
+    handlecourseAddSuccess () {
+      this.courseAdd.visiable = false
+      this.$message.success('新增课程成功')
       this.search()
     },
     edit (record) {
-      this.$refs.classesEdit.setFormValues(record)
-      this.classesEdit.visiable = true
+      this.$refs.courseEdit.setFormValues(record)
+      this.courseEdit.visiable = true
     },
-    handleclassesEditClose () {
-      this.classesEdit.visiable = false
+    handlecourseEditClose () {
+      this.courseEdit.visiable = false
     },
-    handleclassesEditSuccess () {
-      this.classesEdit.visiable = false
-      this.$message.success('修改班级成功')
+    handlecourseEditSuccess () {
+      this.courseEdit.visiable = false
+      this.$message.success('修改课程成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -282,7 +251,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/classes-info/' + ids).then(() => {
+          that.$delete('/cos/course-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -352,7 +321,8 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      this.$get('/cos/classes-info/page', {
+      params.teacherId = this.currentUser.userId
+      this.$get('/cos/course-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

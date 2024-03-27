@@ -21,4 +21,11 @@ public interface IFeesInfoService extends IService<FeesInfo> {
      * @return 结果
      */
     IPage<LinkedHashMap<String, Object>> selectFeesPage(Page<FeesInfo> page, FeesInfo feesInfo);
+
+    /**
+     * 查询主页信息
+     *
+     * @return 结果
+     */
+    LinkedHashMap<String, Object> homeData();
 }

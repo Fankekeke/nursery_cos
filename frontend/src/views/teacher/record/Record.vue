@@ -7,26 +7,18 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="班级编号"
+                label="学生姓名"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.code"/>
+                <a-input v-model="queryParams.studentName"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="班级名称"
+                label="学生编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.name"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="教师名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.teacherName"/>
+                <a-input v-model="queryParams.studentCode"/>
               </a-form-item>
             </a-col>
           </div>
@@ -39,7 +31,7 @@
     </div>
     <div>
       <div class="operator">
-        <a-button type="primary" ghost @click="add">新增</a-button>
+<!--        <a-button type="primary" ghost @click="add">新增</a-button>-->
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -52,76 +44,39 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
-        <template slot="titleShow" slot-scope="text, record">
-          <template>
-            <a-badge status="processing" v-if="record.rackUp === 1"/>
-            <a-badge status="error" v-if="record.rackUp === 0"/>
-            <a-tooltip>
-              <template slot="title">
-                {{ record.title }}
-              </template>
-              {{ record.title.slice(0, 8) }} ...
-            </a-tooltip>
-          </template>
-        </template>
-        <template slot="contentShow" slot-scope="text, record">
-          <template>
-            <a-tooltip>
-              <template slot="title">
-                {{ record.content }}
-              </template>
-              {{ record.content.slice(0, 20) }} ...
-            </a-tooltip>
-          </template>
-        </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
-          <a-icon type="file-search" @click="classesViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
+          <a-icon type="file-search" @click="recordViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
-    <classes-add
-      v-if="classesAdd.visiable"
-      @close="handleclassesAddClose"
-      @success="handleclassesAddSuccess"
-      :classesAddVisiable="classesAdd.visiable">
-    </classes-add>
-    <classes-edit
-      ref="classesEdit"
-      @close="handleclassesEditClose"
-      @success="handleclassesEditSuccess"
-      :classesEditVisiable="classesEdit.visiable">
-    </classes-edit>
-    <classes-view
-      @close="handleclassesViewClose"
-      :classesShow="classesView.visiable"
-      :classesData="classesView.data">
-    </classes-view>
+    <record-view
+      @close="handlerecordViewClose"
+      :recordShow="recordView.visiable"
+      :recordData="recordView.data">
+    </record-view>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
-import classesView from './ClassesView.vue'
-import classesAdd from './ClassesAdd.vue'
-import classesEdit from './ClassesEdit.vue'
+import recordView from './RecordView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'classes',
-  components: {classesAdd, classesEdit, RangeDate, classesView},
+  name: 'record',
+  components: {recordView, RangeDate},
   data () {
     return {
       advanced: false,
-      classesAdd: {
+      recordAdd: {
         visiable: false
       },
-      classesEdit: {
+      recordEdit: {
         visiable: false
       },
-      classesView: {
+      recordView: {
         visiable: false,
         data: null
       },
@@ -148,12 +103,9 @@ export default {
       currentUser: state => state.account.user
     }),
     columns () {
-      return [{
-        title: '班级编号',
-        dataIndex: 'code'
-      }, {
-        title: '班级名称',
-        dataIndex: 'name',
+      return [ {
+        title: '订单编号',
+        dataIndex: 'code',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -162,57 +114,63 @@ export default {
           }
         }
       }, {
-        title: '备注',
-        dataIndex: 'content',
-        scopedSlots: {customRender: 'contentShow'}
+        title: '学生姓名',
+        dataIndex: 'studentName',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
       }, {
-        title: '性别',
-        dataIndex: 'sex',
+        title: '学生头像',
+        dataIndex: 'studentImages',
+        customRender: (text, record, index) => {
+          if (!record.studentImages) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '缴费内容',
+        dataIndex: 'feesName',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '缴费金额',
+        dataIndex: 'price',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '支付状态',
+        dataIndex: 'status',
         customRender: (text, row, index) => {
           switch (text) {
+            case '0':
+              return <a-tag color="red">未缴费</a-tag>
             case '1':
-              return <a-tag>男</a-tag>
-            case '2':
-              return <a-tag>女</a-tag>
+              return <a-tag color="green">已缴费</a-tag>
             default:
               return '- -'
           }
         }
       }, {
-        title: '教师编号',
-        dataIndex: 'teacherCode',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '教师名称',
-        dataIndex: 'teacherName',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '教师头像',
-        dataIndex: 'images',
-        customRender: (text, record, index) => {
-          if (!record.images) return <a-avatar shape="square" icon="user" />
-          return <a-popover>
-            <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
-            </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
-          </a-popover>
-        }
-      }, {
-        title: '创建时间',
-        dataIndex: 'createDate',
+        title: '支付时间',
+        dataIndex: 'payDate',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -231,13 +189,6 @@ export default {
     this.fetch()
   },
   methods: {
-    classesViewOpen (row) {
-      this.classesView.data = row
-      this.classesView.visiable = true
-    },
-    handleclassesViewClose () {
-      this.classesView.visiable = false
-    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
@@ -245,26 +196,33 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.classesAdd.visiable = true
+      this.recordAdd.visiable = true
     },
-    handleclassesAddClose () {
-      this.classesAdd.visiable = false
+    handlerecordAddClose () {
+      this.recordAdd.visiable = false
     },
-    handleclassesAddSuccess () {
-      this.classesAdd.visiable = false
-      this.$message.success('新增班级成功')
+    handlerecordAddSuccess () {
+      this.recordAdd.visiable = false
+      this.$message.success('新增会员成功')
       this.search()
     },
     edit (record) {
-      this.$refs.classesEdit.setFormValues(record)
-      this.classesEdit.visiable = true
+      this.$refs.recordEdit.setFormValues(record)
+      this.recordEdit.visiable = true
     },
-    handleclassesEditClose () {
-      this.classesEdit.visiable = false
+    recordViewOpen (row) {
+      this.recordView.data = row
+      this.recordView.visiable = true
     },
-    handleclassesEditSuccess () {
-      this.classesEdit.visiable = false
-      this.$message.success('修改班级成功')
+    handlerecordViewClose () {
+      this.recordView.visiable = false
+    },
+    handlerecordEditClose () {
+      this.recordEdit.visiable = false
+    },
+    handlerecordEditSuccess () {
+      this.recordEdit.visiable = false
+      this.$message.success('修改会员成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -282,7 +240,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/classes-info/' + ids).then(() => {
+          that.$delete('/cos/pay-record-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -352,7 +310,11 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      this.$get('/cos/classes-info/page', {
+      if (params.delFlag === undefined) {
+        delete params.delFlag
+      }
+      params.teacherId = this.currentUser.userId
+      this.$get('/cos/pay-record-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

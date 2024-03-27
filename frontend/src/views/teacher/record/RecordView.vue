@@ -1,59 +1,43 @@
 <template>
-  <a-modal v-model="show" title="班级详情" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="缴费订单详情" @cancel="onClose" :width="800">
     <template slot="footer">
       <a-button key="back" @click="onClose" type="danger">
         关闭
       </a-button>
     </template>
-    <div style="font-size: 13px;font-family: SimHei" v-if="classesData !== null">
+    <div style="font-size: 13px;font-family: SimHei" v-if="recordData !== null">
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">班级信息</span></a-col>
-        <a-col :span="8"><b>班级编号：</b>
-          {{ classesData.code ? classesData.code : '- -' }}
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">基础信息</span></a-col>
+        <a-col :span="8"><b>学生编号：</b>
+          {{ recordData.studentCode ? recordData.studentCode : '- -' }}
         </a-col>
-        <a-col :span="8"><b>班级名称：</b>
-          {{ classesData.name ? classesData.name : '- -' }}
+        <a-col :span="8"><b>学生姓名：</b>
+          {{ recordData.studentName ? recordData.studentName : '- -' }}
         </a-col>
-        <a-col :span="8"><b>创建时间：</b>
-          {{ classesData.createDate }}
+        <a-col :span="8"><b>联系方式：</b>
+          {{ recordData.phone }}
         </a-col>
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>教师名称：</b>
-          {{ classesData.teacherName }}
+        <a-col :span="8"><b>缴费内容：</b>
+          {{ recordData.feesName }}
         </a-col>
-        <a-col :span="8"><b>教师编号：</b>
-          {{ classesData.teacherCode }}
+        <a-col :span="8"><b>价格：</b>
+          {{ recordData.price }} 元
         </a-col>
-        <a-col :span="8"><b>性别：</b>
-          <span v-if="classesData.sex == 1">男</span>
-          <span v-if="classesData.sex == 2">女</span>
+        <a-col :span="8"><b>缴费状态：</b>
+          <span v-if="recordData.status == 0" style="color: red">未缴费</span>
+          <span v-if="recordData.status == 1" style="color: green">已缴费</span>
         </a-col>
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="24"><b>备注：</b>
-          {{ classesData.content }}
+        <a-col :span="8"><b>支付时间：</b>
+          {{ recordData.payDate }}
         </a-col>
-      </a-row>
-      <br/>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">教师头像</span></a-col>
-        <a-col :span="24">
-          <a-upload
-            name="avatar"
-            action="http://127.0.0.1:9527/file/fileUpload/"
-            list-type="picture-card"
-            :file-list="fileList"
-            @preview="handlePreview"
-            @change="picHandleChange"
-          >
-          </a-upload>
-          <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-            <img alt="example" style="width: 100%" :src="previewImage" />
-          </a-modal>
+        <a-col :span="8"><b>订单编号：</b>
+          {{ recordData.code }}
         </a-col>
       </a-row>
       <br/>
@@ -74,20 +58,20 @@ function getBase64 (file) {
   })
 }
 export default {
-  name: 'userView',
+  name: 'recordView',
   props: {
-    classesShow: {
+    recordShow: {
       type: Boolean,
       default: false
     },
-    classesData: {
+    recordData: {
       type: Object
     }
   },
   computed: {
     show: {
       get: function () {
-        return this.classesShow
+        return this.recordShow
       },
       set: function () {
       }
@@ -100,26 +84,24 @@ export default {
       previewVisible: false,
       previewImage: '',
       repairInfo: null,
+      recordInfo: null,
       durgList: [],
       logisticsList: [],
       userInfo: null
     }
   },
   watch: {
-    classesShow: function (value) {
+    recordShow: function (value) {
       if (value) {
-        if (this.classesData.images) {
-          this.imagesInit(this.classesData.images)
-        }
       }
     }
   },
   methods: {
-    local (classesData) {
+    local (recordData) {
       baiduMap.clearOverlays()
       baiduMap.rMap().enableScrollWheelZoom(true)
       // eslint-disable-next-line no-undef
-      let point = new BMap.Point(classesData.longitude, classesData.latitude)
+      let point = new BMap.Point(recordData.longitude, recordData.latitude)
       baiduMap.pointAdd(point)
       baiduMap.findPoint(point, 16)
       // let driving = new BMap.DrivingRoute(baiduMap.rMap(), {renderOptions:{map: baiduMap.rMap(), autoViewport: true}});

@@ -62,6 +62,12 @@ public class PayRecordInfo implements Serializable {
     @TableField(exist = false)
     private String studentName;
 
-    @TableField(exist = true)
+    @TableField(exist = false)
     private String studentCode;
+
+    /**
+     * 教师ID
+     */
+    @TableField(exist = false)
+    private Integer teacherId;
 }

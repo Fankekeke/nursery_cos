@@ -29,6 +29,9 @@
         <if test="leaveTeacherInfo.teacherName != null and leaveTeacherInfo.teacherName != ''">
             AND ti.name LIKE CONCAT('%',#{leaveTeacherInfo.teacherName},'%')
         </if>
+        <if test="leaveTeacherInfo.teacherId != null and leaveTeacherInfo.teacherId != ''">
+            AND ti.user_id = #{leaveTeacherInfo.teacherId}
+        </if>
         order by
         li.create_date desc
     </select>

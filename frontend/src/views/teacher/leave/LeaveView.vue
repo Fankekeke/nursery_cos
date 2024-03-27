@@ -1,46 +1,48 @@
 <template>
-  <a-modal v-model="show" title="班级详情" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="教师请假详情" @cancel="onClose" :width="800">
     <template slot="footer">
       <a-button key="back" @click="onClose" type="danger">
         关闭
       </a-button>
     </template>
-    <div style="font-size: 13px;font-family: SimHei" v-if="classesData !== null">
+    <div style="font-size: 13px;font-family: SimHei" v-if="memberData !== null">
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">班级信息</span></a-col>
-        <a-col :span="8"><b>班级编号：</b>
-          {{ classesData.code ? classesData.code : '- -' }}
-        </a-col>
-        <a-col :span="8"><b>班级名称：</b>
-          {{ classesData.name ? classesData.name : '- -' }}
-        </a-col>
-        <a-col :span="8"><b>创建时间：</b>
-          {{ classesData.createDate }}
-        </a-col>
-      </a-row>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>教师名称：</b>
-          {{ classesData.teacherName }}
-        </a-col>
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">基础信息</span></a-col>
         <a-col :span="8"><b>教师编号：</b>
-          {{ classesData.teacherCode }}
+          {{ memberData.teacherCode ? memberData.teacherCode : '- -' }}
         </a-col>
-        <a-col :span="8"><b>性别：</b>
-          <span v-if="classesData.sex == 1">男</span>
-          <span v-if="classesData.sex == 2">女</span>
+        <a-col :span="8"><b>教师姓名：</b>
+          {{ memberData.teacherName ? memberData.teacherName : '- -' }}
+        </a-col>
+        <a-col :span="8"><b>联系方式：</b>
+          {{ memberData.phone }}
         </a-col>
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="24"><b>备注：</b>
-          {{ classesData.content }}
+        <a-col :span="8"><b>创建时间：</b>
+          {{ memberData.createDate }}
+        </a-col>
+        <a-col :span="8"><b>请假天数：</b>
+          {{ memberData.days }} 天
+        </a-col>
+        <a-col :span="8"><b>审批状态：</b>
+          <span v-if="memberData.status == 0">未审批</span>
+          <span v-if="memberData.status == 1">通过</span>
+          <span v-if="memberData.status == 2">驳回</span>
         </a-col>
       </a-row>
       <br/>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">教师头像</span></a-col>
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">请加内容</span></a-col>
+        <a-col :span="24">
+          {{ memberData.auditTitle ? memberData.auditTitle : '- -' }}
+        </a-col>
+      </a-row>
+      <br/>
+      <a-row style="padding-left: 24px;padding-right: 24px;">
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">图片</span></a-col>
         <a-col :span="24">
           <a-upload
             name="avatar"
@@ -56,7 +58,6 @@
           </a-modal>
         </a-col>
       </a-row>
-      <br/>
     </div>
   </a-modal>
 </template>
@@ -74,20 +75,20 @@ function getBase64 (file) {
   })
 }
 export default {
-  name: 'userView',
+  name: 'memberView',
   props: {
-    classesShow: {
+    memberShow: {
       type: Boolean,
       default: false
     },
-    classesData: {
+    memberData: {
       type: Object
     }
   },
   computed: {
     show: {
       get: function () {
-        return this.classesShow
+        return this.memberShow
       },
       set: function () {
       }
@@ -100,26 +101,27 @@ export default {
       previewVisible: false,
       previewImage: '',
       repairInfo: null,
+      reserveInfo: null,
       durgList: [],
       logisticsList: [],
       userInfo: null
     }
   },
   watch: {
-    classesShow: function (value) {
+    memberShow: function (value) {
       if (value) {
-        if (this.classesData.images) {
-          this.imagesInit(this.classesData.images)
+        if (this.memberData.images) {
+          this.imagesInit(this.memberData.images)
         }
       }
     }
   },
   methods: {
-    local (classesData) {
+    local (memberData) {
       baiduMap.clearOverlays()
       baiduMap.rMap().enableScrollWheelZoom(true)
       // eslint-disable-next-line no-undef
-      let point = new BMap.Point(classesData.longitude, classesData.latitude)
+      let point = new BMap.Point(memberData.longitude, memberData.latitude)
       baiduMap.pointAdd(point)
       baiduMap.findPoint(point, 16)
       // let driving = new BMap.DrivingRoute(baiduMap.rMap(), {renderOptions:{map: baiduMap.rMap(), autoViewport: true}});

@@ -11,6 +11,7 @@
             ci.teacher_id,
             ci.create_date,
             ci.content,
+            ti.sex,
             ti.code as teacherCode,
             ti.name as teacherName,
             ti.images,
@@ -29,6 +30,9 @@
         </if>
         <if test="classesInfo.teacherName != null and classesInfo.teacherName != ''">
             AND ti.name LIKE CONCAT('%',#{classesInfo.teacherName},'%')
+        </if>
+        <if test="classesInfo.teacherId != null and classesInfo.teacherId != ''">
+            AND ti.user_id = #{classesInfo.teacherId}
         </if>
         order by
             ci.create_date desc
