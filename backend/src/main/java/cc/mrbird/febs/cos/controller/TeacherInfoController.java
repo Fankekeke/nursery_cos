@@ -42,6 +42,17 @@ public class TeacherInfoController {
     /**
      * 教师信息详情
      *
+     * @param userId 教师ID
+     * @return 结果
+     */
+    @GetMapping("/detail/{userId}")
+    public R teacherDetail(@PathVariable("userId") Integer userId) {
+        return R.ok(teacherInfoService.getOne(Wrappers.<TeacherInfo>lambdaQuery().eq(TeacherInfo::getUserId, userId)));
+    }
+
+    /**
+     * 教师信息详情
+     *
      * @param id 教师ID
      * @return 结果
      */

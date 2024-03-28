@@ -1,8 +1,11 @@
 <template>
   <a-modal v-model="show" title="教师请假详情" @cancel="onClose" :width="800">
     <template slot="footer">
-      <a-button key="back" @click="onClose" type="danger">
-        关闭
+      <a-button key="back1" @click="onAudit(1)">
+        通过
+      </a-button>
+      <a-button key="back" @click="onAudit(2)" type="danger">
+        驳回
       </a-button>
     </template>
     <div style="font-size: 13px;font-family: SimHei" v-if="memberData !== null">
@@ -117,6 +120,14 @@ export default {
     }
   },
   methods: {
+    onAudit (status) {
+      this.$get(`/cos/leave-teacher-info/leaveAudit`, {
+        id: this.memberData.id,
+        status: status
+      }).then((r) => {
+        this.$emit('success')
+      })
+    },
     local (memberData) {
       baiduMap.clearOverlays()
       baiduMap.rMap().enableScrollWheelZoom(true)

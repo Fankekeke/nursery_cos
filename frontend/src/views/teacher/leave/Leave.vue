@@ -68,23 +68,33 @@
       :memberShow="memberView.visiable"
       :memberData="memberView.data">
     </member-view>
+    <classes-add
+      v-if="classesAdd.visiable"
+      @close="handleclassesAddClose"
+      @success="handleclassesAddSuccess"
+      :classesAddVisiable="classesAdd.visiable">
+    </classes-add>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
 import memberView from './LeaveView.vue'
+import classesAdd from './LeaveAdd.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
   name: 'member',
-  components: {memberView, RangeDate},
+  components: {memberView, RangeDate, classesAdd},
   data () {
     return {
       advanced: false,
       memberAdd: {
+        visiable: false
+      },
+      classesAdd: {
         visiable: false
       },
       memberEdit: {
@@ -192,14 +202,22 @@ export default {
     this.fetch()
   },
   methods: {
+    add () {
+      this.classesAdd.visiable = true
+    },
+    handleclassesAddClose () {
+      this.classesAdd.visiable = false
+    },
+    handleclassesAddSuccess () {
+      this.classesAdd.visiable = false
+      this.$message.success('新增请假成功')
+      this.search()
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
     toggleAdvanced () {
       this.advanced = !this.advanced
-    },
-    add () {
-      this.memberAdd.visiable = true
     },
     handlememberAddClose () {
       this.memberAdd.visiable = false

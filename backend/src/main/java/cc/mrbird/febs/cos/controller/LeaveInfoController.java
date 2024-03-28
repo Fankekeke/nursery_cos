@@ -3,8 +3,12 @@ package cc.mrbird.febs.cos.controller;
 
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.LeaveInfo;
+import cc.mrbird.febs.cos.entity.StudentInfo;
+import cc.mrbird.febs.cos.entity.TeacherInfo;
 import cc.mrbird.febs.cos.service.ILeaveInfoService;
+import cc.mrbird.febs.cos.service.IStudentInfoService;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +27,30 @@ public class LeaveInfoController {
 
     private final ILeaveInfoService leaveInfoService;
 
+    private final IStudentInfoService studentInfoService;
+
     /**
      * 分页获取请假信息
      *
-     * @param page         分页对象
+     * @param page      分页对象
      * @param leaveInfo 请假信息
      * @return 结果
      */
     @GetMapping("/page")
     public R page(Page<LeaveInfo> page, LeaveInfo leaveInfo) {
         return R.ok(leaveInfoService.selectLeavePage(page, leaveInfo));
+    }
+
+    /**
+     * 学生请假审批
+     *
+     * @param id     主键
+     * @param status 状态
+     * @return 结果
+     */
+    @GetMapping("/leaveAudit")
+    public R leaveAudit(Integer id, String status) {
+        return R.ok(leaveInfoService.update(Wrappers.<LeaveInfo>lambdaUpdate().set(LeaveInfo::getStatus, status).eq(LeaveInfo::getId, id)));
     }
 
     /**
@@ -64,6 +82,8 @@ public class LeaveInfoController {
      */
     @PostMapping
     public R save(LeaveInfo leaveInfo) {
+        StudentInfo studentInfo = studentInfoService.getOne(Wrappers.<StudentInfo>lambdaQuery().eq(StudentInfo::getUserId, leaveInfo.getStudentId()));
+        leaveInfo.setStudentId(studentInfo.getId());
         leaveInfo.setStatus("0");
         leaveInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         return R.ok(leaveInfoService.save(leaveInfo));

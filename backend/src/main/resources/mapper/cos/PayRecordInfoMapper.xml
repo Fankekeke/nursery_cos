@@ -37,6 +37,9 @@
         <if test="payRecordInfo.teacherId != null and payRecordInfo.teacherId != ''">
             AND ti.user_id = #{payRecordInfo.teacherId}
         </if>
+        <if test="payRecordInfo.studentId != null and payRecordInfo.studentId != ''">
+            AND si.user_id = #{payRecordInfo.studentId}
+        </if>
         order by
         pri.pay_date desc
     </select>

@@ -7,22 +7,18 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="教师姓名"
+                label="学生姓名"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.teacherName"/>
+                <a-input v-model="queryParams.studentName"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="审批状态"
+                label="学生编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-select v-model="queryParams.status">
-                  <a-select-option value="0">未审批</a-select-option>
-                  <a-select-option value="1">通过</a-select-option>
-                  <a-select-option value="2">驳回</a-select-option>
-                </a-select>
+                <a-input v-model="queryParams.studentCode"/>
               </a-form-item>
             </a-col>
           </div>
@@ -36,7 +32,7 @@
     <div>
       <div class="operator">
 <!--        <a-button type="primary" ghost @click="add">新增</a-button>-->
-        <a-button @click="batchDelete">删除</a-button>
+<!--        <a-button @click="batchDelete">删除</a-button>-->
       </div>
       <!-- 表格区域 -->
       <a-table ref="TableInfo"
@@ -48,50 +44,40 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
-        <template slot="contentShow" slot-scope="text, record">
-          <template>
-            <a-tooltip>
-              <template slot="title">
-                {{ record.auditTitle }}
-              </template>
-              {{ record.auditTitle.slice(0, 20) }} ...
-            </a-tooltip>
-          </template>
-        </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="file-search" @click="memberViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
+          <a-icon v-if="record.status == 0" type="alipay" @click="pay(record)" title="支 付"></a-icon>
+          <a-icon type="file-search" @click="recordViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
-    <member-view
-      @close="handlememberViewClose"
-      @success="handlememberViewSuccess"
-      :memberShow="memberView.visiable"
-      :memberData="memberView.data">
-    </member-view>
+    <record-view
+      @close="handlerecordViewClose"
+      :recordShow="recordView.visiable"
+      :recordData="recordView.data">
+    </record-view>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
-import memberView from './LeaveView.vue'
+import recordView from './RecordView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'member',
-  components: {memberView, RangeDate},
+  name: 'record',
+  components: {recordView, RangeDate},
   data () {
     return {
       advanced: false,
-      memberAdd: {
+      recordAdd: {
         visiable: false
       },
-      memberEdit: {
+      recordEdit: {
         visiable: false
       },
-      memberView: {
+      recordView: {
         visiable: false,
         data: null
       },
@@ -119,11 +105,8 @@ export default {
     }),
     columns () {
       return [ {
-        title: '教师编号',
-        dataIndex: 'teacherCode'
-      }, {
-        title: '教师名称',
-        dataIndex: 'teacherName',
+        title: '订单编号',
+        dataIndex: 'code',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -132,49 +115,63 @@ export default {
           }
         }
       }, {
-        title: '教师头像',
-        dataIndex: 'teacherImages',
-        customRender: (text, record, index) => {
-          if (!record.teacherImages) return <a-avatar shape="square" icon="user" />
-          return <a-popover>
-            <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.teacherImages.split(',')[0] } />
-            </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.teacherImages.split(',')[0] } />
-          </a-popover>
-        }
-      }, {
-        title: '请假内容',
-        dataIndex: 'auditTitle',
-        scopedSlots: { customRender: 'contentShow' }
-      }, {
-        title: '审批状态',
-        dataIndex: 'status',
-        customRender: (text, row, index) => {
-          switch (text) {
-            case '0':
-              return <a-tag>未审批</a-tag>
-            case '1':
-              return <a-tag>通过</a-tag>
-            case '2':
-              return <a-tag>驳回</a-tag>
-            default:
-              return '- -'
-          }
-        }
-      }, {
-        title: '请假天数',
-        dataIndex: 'days',
+        title: '学生姓名',
+        dataIndex: 'studentName',
         customRender: (text, row, index) => {
           if (text !== null) {
-            return text + '天'
+            return text
           } else {
             return '- -'
           }
         }
       }, {
-        title: '创建时间',
-        dataIndex: 'createDate',
+        title: '学生头像',
+        dataIndex: 'studentImages',
+        customRender: (text, record, index) => {
+          if (!record.studentImages) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '缴费内容',
+        dataIndex: 'feesName',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '缴费金额',
+        dataIndex: 'price',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '支付状态',
+        dataIndex: 'status',
+        customRender: (text, row, index) => {
+          switch (text) {
+            case '0':
+              return <a-tag color="red">未缴费</a-tag>
+            case '1':
+              return <a-tag color="green">已缴费</a-tag>
+            default:
+              return '- -'
+          }
+        }
+      }, {
+        title: '支付时间',
+        dataIndex: 'payDate',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -193,6 +190,23 @@ export default {
     this.fetch()
   },
   methods: {
+    pay (row) {
+      let data = { outTradeNo: row.code, subject: `${row.feesName}`, totalAmount: row.price, body: '' }
+      this.$post('/cos/pay/alipay', data).then((r) => {
+        // console.log(r.data.msg)
+        // 添加之前先删除一下，如果单页面，页面不刷新，添加进去的内容会一直保留在页面中，二次调用form表单会出错
+        const divForm = document.getElementsByTagName('div')
+        if (divForm.length) {
+          document.body.removeChild(divForm[0])
+        }
+        const div = document.createElement('div')
+        div.innerHTML = r.data.msg // data就是接口返回的form 表单字符串
+        // console.log(div.innerHTML)
+        document.body.appendChild(div)
+        document.forms[0].setAttribute('target', '_self') // 新开窗口跳转
+        document.forms[0].submit()
+      })
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
@@ -200,38 +214,33 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.memberAdd.visiable = true
+      this.recordAdd.visiable = true
     },
-    handlememberAddClose () {
-      this.memberAdd.visiable = false
+    handlerecordAddClose () {
+      this.recordAdd.visiable = false
     },
-    handlememberAddSuccess () {
-      this.memberAdd.visiable = false
-      this.$message.success('新增请假成功')
+    handlerecordAddSuccess () {
+      this.recordAdd.visiable = false
+      this.$message.success('新增会员成功')
       this.search()
     },
     edit (record) {
-      this.$refs.memberEdit.setFormValues(record)
-      this.memberEdit.visiable = true
+      this.$refs.recordEdit.setFormValues(record)
+      this.recordEdit.visiable = true
     },
-    memberViewOpen (row) {
-      this.memberView.data = row
-      this.memberView.visiable = true
+    recordViewOpen (row) {
+      this.recordView.data = row
+      this.recordView.visiable = true
     },
-    handlememberViewSuccess () {
-      this.$message.success('审批成功')
-      this.memberView.visiable = false
-      this.search()
+    handlerecordViewClose () {
+      this.recordView.visiable = false
     },
-    handlememberViewClose () {
-      this.memberView.visiable = false
+    handlerecordEditClose () {
+      this.recordEdit.visiable = false
     },
-    handlememberEditClose () {
-      this.memberEdit.visiable = false
-    },
-    handlememberEditSuccess () {
-      this.memberEdit.visiable = false
-      this.$message.success('修改请假成功')
+    handlerecordEditSuccess () {
+      this.recordEdit.visiable = false
+      this.$message.success('修改会员成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -249,7 +258,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/leave-teacher-info/' + ids).then(() => {
+          that.$delete('/cos/pay-record-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -319,10 +328,11 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      if (params.status === undefined) {
-        delete params.status
+      if (params.delFlag === undefined) {
+        delete params.delFlag
       }
-      this.$get('/cos/leave-teacher-info/page', {
+      params.studentId = this.currentUser.userId
+      this.$get('/cos/pay-record-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

@@ -7,6 +7,14 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
+                label="学生姓名"
+                :labelCol="{span: 5}"
+                :wrapperCol="{span: 18, offset: 1}">
+                <a-input v-model="queryParams.studentName"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="24">
+              <a-form-item
                 label="教师姓名"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
@@ -35,7 +43,7 @@
     </div>
     <div>
       <div class="operator">
-<!--        <a-button type="primary" ghost @click="add">新增</a-button>-->
+        <a-button type="primary" ghost @click="add">添加请假申请</a-button>
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -65,27 +73,36 @@
     </div>
     <member-view
       @close="handlememberViewClose"
-      @success="handlememberViewSuccess"
       :memberShow="memberView.visiable"
       :memberData="memberView.data">
     </member-view>
+    <classes-add
+      v-if="classesAdd.visiable"
+      @close="handleclassesAddClose"
+      @success="handleclassesAddSuccess"
+      :classesAddVisiable="classesAdd.visiable">
+    </classes-add>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
 import memberView from './LeaveView.vue'
+import classesAdd from './LeaveAdd.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
   name: 'member',
-  components: {memberView, RangeDate},
+  components: {memberView, RangeDate, classesAdd},
   data () {
     return {
       advanced: false,
       memberAdd: {
+        visiable: false
+      },
+      classesAdd: {
         visiable: false
       },
       memberEdit: {
@@ -119,11 +136,11 @@ export default {
     }),
     columns () {
       return [ {
-        title: '教师编号',
-        dataIndex: 'teacherCode'
+        title: '学生编号',
+        dataIndex: 'studentCode'
       }, {
-        title: '教师名称',
-        dataIndex: 'teacherName',
+        title: '学生名称',
+        dataIndex: 'studentName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -132,15 +149,15 @@ export default {
           }
         }
       }, {
-        title: '教师头像',
-        dataIndex: 'teacherImages',
+        title: '学生头像',
+        dataIndex: 'studentImages',
         customRender: (text, record, index) => {
-          if (!record.teacherImages) return <a-avatar shape="square" icon="user" />
+          if (!record.studentImages) return <a-avatar shape="square" icon="user" />
           return <a-popover>
             <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.teacherImages.split(',')[0] } />
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
             </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.teacherImages.split(',')[0] } />
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.studentImages.split(',')[0] } />
           </a-popover>
         }
       }, {
@@ -193,14 +210,22 @@ export default {
     this.fetch()
   },
   methods: {
+    add () {
+      this.classesAdd.visiable = true
+    },
+    handleclassesAddClose () {
+      this.classesAdd.visiable = false
+    },
+    handleclassesAddSuccess () {
+      this.classesAdd.visiable = false
+      this.$message.success('新增请假成功')
+      this.search()
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
     toggleAdvanced () {
       this.advanced = !this.advanced
-    },
-    add () {
-      this.memberAdd.visiable = true
     },
     handlememberAddClose () {
       this.memberAdd.visiable = false
@@ -217,11 +242,6 @@ export default {
     memberViewOpen (row) {
       this.memberView.data = row
       this.memberView.visiable = true
-    },
-    handlememberViewSuccess () {
-      this.$message.success('审批成功')
-      this.memberView.visiable = false
-      this.search()
     },
     handlememberViewClose () {
       this.memberView.visiable = false
@@ -249,7 +269,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/leave-teacher-info/' + ids).then(() => {
+          that.$delete('/cos/leave-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -322,7 +342,8 @@ export default {
       if (params.status === undefined) {
         delete params.status
       }
-      this.$get('/cos/leave-teacher-info/page', {
+      params.studentId = this.currentUser.userId
+      this.$get('/cos/leave-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

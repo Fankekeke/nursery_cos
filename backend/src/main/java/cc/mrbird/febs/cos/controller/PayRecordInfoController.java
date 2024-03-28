@@ -5,6 +5,7 @@ import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.PayRecordInfo;
 import cc.mrbird.febs.cos.service.IPayRecordInfoService;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,28 @@ public class PayRecordInfoController {
     /**
      * 分页获取缴费记录信息
      *
-     * @param page         分页对象
+     * @param page          分页对象
      * @param payRecordInfo 缴费记录信息
      * @return 结果
      */
     @GetMapping("/page")
     public R page(Page<PayRecordInfo> page, PayRecordInfo payRecordInfo) {
         return R.ok(payRecordInfoService.selectRecordPage(page, payRecordInfo));
+    }
+
+    /**
+     * 支付宝回调
+     *
+     * @param orderCode 订单编号
+     * @return 结果
+     */
+    @GetMapping("/rollback")
+    public R rollback(String orderCode) {
+        // 获取缴费记录
+        PayRecordInfo payRecordInfo = payRecordInfoService.getOne(Wrappers.<PayRecordInfo>lambdaQuery().eq(PayRecordInfo::getCode, orderCode));
+        payRecordInfo.setStatus("1");
+        payRecordInfo.setPayDate(DateUtil.formatDateTime(new Date()));
+        return R.ok(payRecordInfoService.updateById(payRecordInfo));
     }
 
     /**

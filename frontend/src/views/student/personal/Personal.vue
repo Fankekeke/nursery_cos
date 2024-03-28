@@ -5,7 +5,7 @@
         <a-form :form="form" layout="vertical">
           <a-row :gutter="20">
             <a-col :span="12">
-              <a-form-item label='教师编号' v-bind="formItemLayout">
+              <a-form-item label='学生编号' v-bind="formItemLayout">
                 <a-input disabled v-decorator="[
                 'code',
                 ]"/>
@@ -19,10 +19,10 @@
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label='教师姓名' v-bind="formItemLayout">
+              <a-form-item label='学生姓名' v-bind="formItemLayout">
                 <a-input v-decorator="[
                 'name',
-                { rules: [{ required: true, message: '请输入用教师姓名!' }] }
+                { rules: [{ required: true, message: '请输入用学生姓名!' }] }
                 ]"/>
               </a-form-item>
             </a-col>
@@ -164,7 +164,7 @@ export default {
     },
     getExpertInfo (userId) {
       this.dataLoading = true
-      this.$get(`/cos/teacher-info/detail/${userId}`).then((r) => {
+      this.$get(`/cos/student-info/detail/${userId}`).then((r) => {
         this.expertInfo = r.data.data
         console.log(this.expertInfo)
         this.setFormValues(this.expertInfo)
@@ -233,7 +233,7 @@ export default {
         values.images = images.length > 0 ? images.join(',') : null
         if (!err) {
           this.loading = true
-          this.$put('/cos/teacher-info', {
+          this.$put('/cos/student-info', {
             ...values
           }).then((r) => {
             this.$message.success('更新成功')

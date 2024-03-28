@@ -80,7 +80,7 @@ public class FeesInfoController {
         feesInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         feesInfoService.save(feesInfo);
 
-        List<StudentInfo> studentInfoList = studentInfoService.list(Wrappers.<StudentInfo>lambdaQuery().eq(StudentInfo::getClassesId, feesInfo.getId()));
+        List<StudentInfo> studentInfoList = studentInfoService.list(Wrappers.<StudentInfo>lambdaQuery().eq(StudentInfo::getClassesId, feesInfo.getClassId()));
         if (CollectionUtil.isEmpty(studentInfoList)) {
             throw new FebsException("此班级没有学生！");
         }
