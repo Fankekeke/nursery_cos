@@ -2,7 +2,7 @@
   <div>
     <a-row style="margin-top: 15px">
       <a-col :span="24">
-        <div style="background: #ECECEC; padding: 30px;" v-if="user.roleId == 74 || user.roleId == 76">
+        <div style="background: #ECECEC; padding: 30px;" v-if="user.roleId == 74">
           <a-row :gutter="16">
             <a-col :span="6">
               <a-card hoverable>
@@ -56,7 +56,7 @@
         </div>
       </a-col>
     </a-row>
-    <a-row style="margin-top: 15px" v-if="user.roleId == 74 || user.roleId == 76">
+    <a-row style="margin-top: 15px" v-if="user.roleId == 74">
       <a-col :span="12">
         <a-card hoverable :bordered="false" style="width: 100%">
           <a-skeleton active v-if="loading" />
@@ -70,7 +70,7 @@
         </a-card>
       </a-col>
     </a-row>
-    <a-row style="margin-top: 15px" v-if="user.roleId == 74 || user.roleId == 76">
+    <a-row style="margin-top: 15px" v-if="user.roleId == 74">
 <!--      <a-col :span="9">-->
 <!--        <a-card hoverable :bordered="false" style="width: 100%">-->
 <!--          <a-skeleton active v-if="loading" />-->
@@ -84,9 +84,30 @@
 <!--        </a-card>-->
 <!--      </a-col>-->
     </a-row>
-    <a-row style="margin-top: 15px">
+    <a-row style="margin-top: 15px" v-if="user.roleId == 75 || user.roleId == 76">
+      <a-col :span="24">
+        <a-card :loading="loading" :bordered="false" title="公告信息" style="margin-top: 15px">
+          <div style="padding: 0 22px">
+            <a-list item-layout="vertical" :pagination="pagination" :data-source="bulletinList">
+              <a-list-item slot="renderItem" key="item.title" slot-scope="item, index">
+                <template slot="actions">
+              <span key="message">
+                <a-icon type="message" style="margin-right: 8px" />
+                {{ item.date }}
+              </span>
+                </template>
+                <a-list-item-meta :description="item.content" style="font-size: 14px">
+                  <a slot="title">{{ item.title }}</a>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </div>
+        </a-card>
+      </a-col>
+    </a-row>
+    <a-row style="margin-top: 15px" v-if="user.roleId == 74">
       <a-col :span="12">
-        <a-card hoverable :loading="loading" :bordered="false" title="公告信息" style="margin-top: 15px">
+        <a-card :loading="loading" :bordered="false" title="公告信息" style="margin-top: 15px">
           <div style="padding: 0 22px">
             <a-list item-layout="vertical" :pagination="pagination" :data-source="bulletinList">
               <a-list-item slot="renderItem" key="item.title" slot-scope="item, index">
@@ -124,7 +145,7 @@ export default {
         onChange: page => {
           console.log(page)
         },
-        pageSize: 2
+        pageSize: 3
       },
       bulletinList: [],
       titleData: {

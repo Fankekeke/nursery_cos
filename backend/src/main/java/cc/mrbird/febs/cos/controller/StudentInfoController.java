@@ -2,7 +2,9 @@ package cc.mrbird.febs.cos.controller;
 
 
 import cc.mrbird.febs.common.utils.R;
+import cc.mrbird.febs.cos.entity.SavorInfo;
 import cc.mrbird.febs.cos.entity.StudentInfo;
+import cc.mrbird.febs.cos.service.ISavorInfoService;
 import cc.mrbird.febs.cos.service.IStudentInfoService;
 import cc.mrbird.febs.system.service.UserService;
 import cn.hutool.core.date.DateUtil;
@@ -27,6 +29,8 @@ public class StudentInfoController {
 
     private final UserService userService;
 
+    private final ISavorInfoService savorInfoService;
+
     /**
      * 分页获取学生信息
      *
@@ -47,7 +51,13 @@ public class StudentInfoController {
      */
     @GetMapping("/detail/{userId}")
     public R studentDetail(@PathVariable("userId") Integer userId) {
-        return R.ok(studentInfoService.getOne(Wrappers.<StudentInfo>lambdaQuery().eq(StudentInfo::getUserId, userId)));
+        StudentInfo studentInfo = studentInfoService.getOne(Wrappers.<StudentInfo>lambdaQuery().eq(StudentInfo::getUserId, userId));
+        // 学生兴趣
+        SavorInfo smiInfo = savorInfoService.getOne(Wrappers.<SavorInfo>lambdaQuery().eq(SavorInfo::getStudentId, studentInfo.getId()));
+        if (smiInfo != null) {
+            studentInfo.setInterest(smiInfo.getInterest());
+        }
+        return R.ok(studentInfo);
     }
 
     /**
@@ -93,6 +103,18 @@ public class StudentInfoController {
      */
     @PutMapping
     public R edit(StudentInfo studentInfo) {
+        // 学生兴趣
+        SavorInfo smiInfo = savorInfoService.getOne(Wrappers.<SavorInfo>lambdaQuery().eq(SavorInfo::getStudentId, studentInfo.getId()));
+        if (smiInfo != null) {
+            smiInfo.setInterest(studentInfo.getInterest());
+            savorInfoService.updateById(smiInfo);
+        } else {
+            SavorInfo smiInfo2 = new SavorInfo();
+            smiInfo2.setInterest(studentInfo.getInterest());
+            smiInfo2.setStudentId(studentInfo.getId());
+            smiInfo2.setCreateDate(DateUtil.formatDateTime(new Date()));
+            savorInfoService.save(smiInfo2);
+        }
         return R.ok(studentInfoService.updateById(studentInfo));
     }
 

@@ -52,8 +52,15 @@
               </a-form-item>
             </a-col>
             <a-col :span="24">
+              <a-form-item label='学生兴趣' v-bind="formItemLayout">
+                <a-textarea :rows="4" v-decorator="[
+                'interest'
+                ]"/>
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
               <a-form-item label='备注' v-bind="formItemLayout">
-                <a-textarea :rows="6" v-decorator="[
+                <a-textarea :rows="4" v-decorator="[
                 'content',
                  { rules: [{ required: true, message: '请输入备注!' }] }
                 ]"/>
@@ -100,6 +107,22 @@
           </a-col>
         </a-row>
       </a-card>
+      <a-list item-layout="horizontal" :data-source="coursesList" style="margin-top: 30px;width: 100%">
+        <a-list-item slot="renderItem" slot-scope="item, index">
+          <a-list-item-meta
+            :description="item.content"
+          >
+            <a slot="title">
+              <span>{{ item.courseName }}</span>
+              <span> - {{ item.teacherName }}</span>
+            </a>
+            <a-avatar
+              slot="avatar"
+              :src="'http://127.0.0.1:9527/imagesWeb/' + item.images.split(',')[0]"
+            />
+          </a-list-item-meta>
+        </a-list-item>
+      </a-list>
     </a-col>
   </a-row>
 </template>
@@ -135,6 +158,7 @@ export default {
       courseInfo: [],
       dataLoading: false,
       fileList: [],
+      coursesList: [],
       previewVisible: false,
       previewImage: '',
       expertInfo: null
@@ -142,6 +166,7 @@ export default {
   },
   mounted () {
     this.getExpertInfo(this.currentUser.userId)
+    this.recommendCourses(this.currentUser.userId)
   },
   methods: {
     isDuringDate (beginDateStr, endDateStr, curDataStr) {
@@ -161,6 +186,11 @@ export default {
         }
       })
       return listData || []
+    },
+    recommendCourses (userId) {
+      this.$get(`/cos/savor-info/recommendCourses/${userId}`).then((r) => {
+        this.coursesList = r.data.data
+      })
     },
     getExpertInfo (userId) {
       this.dataLoading = true
@@ -196,7 +226,7 @@ export default {
     },
     setFormValues ({...expert}) {
       this.rowId = expert.id
-      let fields = ['code', 'name', 'phone', 'sex', 'email', 'images', 'createDate', 'birthday', 'content']
+      let fields = ['code', 'name', 'phone', 'sex', 'email', 'images', 'createDate', 'birthday', 'content', 'interest']
       let obj = {}
       Object.keys(expert).forEach((key) => {
         if (key === 'images') {

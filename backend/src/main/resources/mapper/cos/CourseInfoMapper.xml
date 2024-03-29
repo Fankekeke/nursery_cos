@@ -5,22 +5,22 @@
     <!-- 分页获取课程信息 -->
     <select id="selectCoursePage" resultType="java.util.LinkedHashMap">
         select
-            ci.id,
-            ci.course_name,
-            ci.content,
-            ci.code,
-            ci.teacher_id,
-            ci.create_date,
-            ti.code as teacherCode,
-            ti.name as teacherName,
-            ti.images,
-            ti.phone
+        ci.id,
+        ci.course_name,
+        ci.content,
+        ci.code,
+        ci.teacher_id,
+        ci.create_date,
+        ti.code as teacherCode,
+        ti.name as teacherName,
+        ti.images,
+        ti.phone
         from
-            course_info ci
-                left join teacher_info ti on
-                (ti.id = ci.teacher_id)
+        course_info ci
+        left join teacher_info ti on
+        (ti.id = ci.teacher_id)
         where
-            1 = 1
+        1 = 1
         <if test="courseInfo.courseName != null and courseInfo.courseName != ''">
             AND ci.course_name LIKE CONCAT('%',#{courseInfo.courseName},'%')
         </if>
@@ -34,7 +34,33 @@
             AND ti.user_id = #{courseInfo.teacherId}
         </if>
         order by
-            ci.create_date desc
+        ci.create_date desc
+    </select>
 
+    <!-- 根据ID获取课程信息 -->
+    <select id="selectCourseByIds" resultType="java.util.LinkedHashMap">
+        select
+        ci.id,
+        ci.course_name,
+        ci.content,
+        ci.code,
+        ci.teacher_id,
+        ci.create_date,
+        ti.code as teacherCode,
+        ti.name as teacherName,
+        ti.images,
+        ti.phone
+        from
+        course_info ci
+        left join teacher_info ti on
+        (ti.id = ci.teacher_id)
+        where
+        1 = 1
+        AND ci.id in
+        <foreach item="item" collection="ids" separator="," open="(" close=")" index="">
+          #{item}
+        </foreach>
+        order by
+        ci.create_date desc
     </select>
 </mapper>

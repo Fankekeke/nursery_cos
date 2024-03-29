@@ -26,13 +26,24 @@ public class SavorInfoController {
     /**
      * 分页获取学生兴趣信息
      *
-     * @param page         分页对象
+     * @param page      分页对象
      * @param savorInfo 学生兴趣信息
      * @return 结果
      */
     @GetMapping("/page")
     public R page(Page<SavorInfo> page, SavorInfo savorInfo) {
         return R.ok(savorInfoService.selectSavorPage(page, savorInfo));
+    }
+
+    /**
+     * 学生推荐课程
+     *
+     * @param userId 学生ID
+     * @return 结果
+     */
+    @GetMapping("/recommendCourses/{userId}")
+    public R recommendCourses(@PathVariable("userId") Integer userId) {
+        return R.ok(savorInfoService.recommendCourses(userId));
     }
 
     /**

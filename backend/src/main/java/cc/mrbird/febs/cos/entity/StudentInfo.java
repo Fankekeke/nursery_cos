@@ -82,5 +82,7 @@ public class StudentInfo implements Serializable {
     @TableField(exist = false)
     private Integer teacherId;
 
+    @TableField(exist = false)
+    private String interest;
 
 }
