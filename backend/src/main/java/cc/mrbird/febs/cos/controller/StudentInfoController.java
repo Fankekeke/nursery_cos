@@ -2,10 +2,13 @@ package cc.mrbird.febs.cos.controller;
 
 
 import cc.mrbird.febs.common.utils.R;
+import cc.mrbird.febs.cos.entity.ClassesInfo;
 import cc.mrbird.febs.cos.entity.SavorInfo;
 import cc.mrbird.febs.cos.entity.StudentInfo;
+import cc.mrbird.febs.cos.service.IClassesInfoService;
 import cc.mrbird.febs.cos.service.ISavorInfoService;
 import cc.mrbird.febs.cos.service.IStudentInfoService;
+import cc.mrbird.febs.cos.service.ITeacherInfoService;
 import cc.mrbird.febs.system.service.UserService;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -31,10 +34,14 @@ public class StudentInfoController {
 
     private final ISavorInfoService savorInfoService;
 
+    private final IClassesInfoService classesInfoService;
+
+    private final ITeacherInfoService teacherInfoService;
+
     /**
      * 分页获取学生信息
      *
-     * @param page         分页对象
+     * @param page        分页对象
      * @param studentInfo 学生信息
      * @return 结果
      */
@@ -58,6 +65,22 @@ public class StudentInfoController {
             studentInfo.setInterest(smiInfo.getInterest());
         }
         return R.ok(studentInfo);
+    }
+
+    /**
+     * 获取学生代课老师信息
+     *
+     * @param userId 学生ID
+     * @return 结果
+     */
+    @GetMapping("/teacher/{userId}")
+    public R selectTeacherByStudentId(@PathVariable("userId") Integer userId) {
+        StudentInfo studentInfo = studentInfoService.getOne(Wrappers.<StudentInfo>lambdaQuery().eq(StudentInfo::getUserId, userId));
+        // 班级信息
+        ClassesInfo classesInfo = classesInfoService.getById(studentInfo.getClassesId());
+
+        // 教师信息
+        return R.ok(teacherInfoService.getById(classesInfo.getTeacherId()));
     }
 
     /**

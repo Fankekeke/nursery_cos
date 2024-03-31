@@ -96,18 +96,39 @@
       </a-card>
     </a-col>
     <a-col :span="12" v-if="expertInfo != null" style="margin-top: 30px;padding-left: 50px">
-      <a-card :bordered="false">
-        <a-row>
-          <a-col :span="5">
-            <a-avatar :src="'http://127.0.0.1:9527/imagesWeb/' + expertInfo.images" shape="square" style="width: 100px;height: 100px;"/>
-          </a-col>
-          <a-col :span="12">
-            <div style="font-size: 20px;font-family: SimHei">{{ expertInfo.name }}</div>
-            <p style="font-size: 13px;font-family: SimHei">{{ expertInfo.code }}</p>
-          </a-col>
-        </a-row>
-      </a-card>
-      <a-list item-layout="horizontal" :data-source="coursesList" style="margin-top: 30px;width: 100%">
+      <a-row>
+        <a-col :span="12">
+          <div style="font-size: 20px;font-family: SimHei;margin-left: 30px">我的信息</div>
+          <a-card :bordered="false">
+            <a-row>
+              <a-col :span="12">
+                <a-avatar :src="'http://127.0.0.1:9527/imagesWeb/' + expertInfo.images" shape="square" style="width: 100px;height: 100px;"/>
+              </a-col>
+              <a-col :span="12">
+                <div style="font-size: 20px;font-family: SimHei">{{ expertInfo.name }}</div>
+                <p style="font-size: 13px;font-family: SimHei">{{ expertInfo.code }}</p>
+              </a-col>
+            </a-row>
+          </a-card>
+        </a-col>
+        <a-col :span="12">
+          <div style="font-size: 20px;font-family: SimHei;margin-left: 30px">我的导师</div>
+          <a-card :bordered="false" v-if="teacherInfo != null">
+            <a-row>
+              <a-col :span="12">
+                <a-avatar :src="'http://127.0.0.1:9527/imagesWeb/' + teacherInfo.images" shape="square" style="width: 100px;height: 100px;"/>
+              </a-col>
+              <a-col :span="12">
+                <div style="font-size: 20px;font-family: SimHei">{{ teacherInfo.name }}</div>
+                <p style="font-size: 13px;font-family: SimHei">{{ teacherInfo.code }}</p>
+                <p style="font-size: 13px;font-family: SimHei">联系方式：{{ teacherInfo.phone }}</p>
+              </a-col>
+            </a-row>
+          </a-card>
+        </a-col>
+      </a-row>
+      <div style="font-size: 20px;font-family: SimHei;margin-left: 30px;margin-top: 30px">推荐课程</div>
+      <a-list item-layout="horizontal" :data-source="coursesList" style="margin-top: 10px;width: 100%">
         <a-list-item slot="renderItem" slot-scope="item, index">
           <a-list-item-meta
             :description="item.content"
@@ -161,12 +182,14 @@ export default {
       coursesList: [],
       previewVisible: false,
       previewImage: '',
-      expertInfo: null
+      expertInfo: null,
+      teacherInfo: null
     }
   },
   mounted () {
     this.getExpertInfo(this.currentUser.userId)
     this.recommendCourses(this.currentUser.userId)
+    this.getTeacher(this.currentUser.userId)
   },
   methods: {
     isDuringDate (beginDateStr, endDateStr, curDataStr) {
@@ -190,6 +213,11 @@ export default {
     recommendCourses (userId) {
       this.$get(`/cos/savor-info/recommendCourses/${userId}`).then((r) => {
         this.coursesList = r.data.data
+      })
+    },
+    getTeacher (userId) {
+      this.$get(`/cos/student-info/teacher/${userId}`).then((r) => {
+        this.teacherInfo = r.data.data
       })
     },
     getExpertInfo (userId) {
@@ -261,6 +289,7 @@ export default {
       this.form.validateFields((err, values) => {
         values.id = this.rowId
         values.images = images.length > 0 ? images.join(',') : null
+        values.birthday = moment(values.birthday).format('YYYY-MM-DD')
         if (!err) {
           this.loading = true
           this.$put('/cos/student-info', {

@@ -63,7 +63,7 @@ public class SavorInfoServiceImpl extends ServiceImpl<SavorInfoMapper, SavorInfo
             interest = savorInfo.getInterest();
         }
 
-        List<String> interestList = Arrays.asList(StrUtil.split(interest, " "));
+        List<String> interestList = Arrays.asList(StrUtil.split(interest, ","));
         // 根据兴趣信息获取课程
         List<CourseInfo> courseInfoList = courseInfoService.list();
 
@@ -77,8 +77,11 @@ public class SavorInfoServiceImpl extends ServiceImpl<SavorInfoMapper, SavorInfo
         }
 
         for (CourseInfo courseInfo : courseInfoList) {
-            if (interestList.contains(courseInfo.getCourseName())) {
-                resultList.add(courseInfo);
+            for (String s : interestList) {
+                if (courseInfo.getContent().contains(s)) {
+                    resultList.add(courseInfo);
+                    break;
+                }
             }
         }
         if (CollectionUtil.isEmpty(resultList)) {

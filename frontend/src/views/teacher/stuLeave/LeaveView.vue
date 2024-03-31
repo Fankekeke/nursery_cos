@@ -1,5 +1,5 @@
 <template>
-  <a-modal v-model="show" title="教师请假详情" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="学生请假详情" @cancel="onClose" :width="800">
     <template slot="footer">
       <a-button key="back1" @click="onAudit(1)">
         通过
