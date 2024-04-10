@@ -70,9 +70,9 @@ shangjia
 | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715131716.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715333646.jpg) |
 | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715119233.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715314153.jpg) |
 | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715108310.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715302641.jpg) |
-| ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715093127.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715218741.jpg) |
+| ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715188944.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715218741.jpg) |
 | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711718188198.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715203107.jpg) |
-| ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711718175800.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711715188944.jpg) |
+| ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1711718175800.jpg) | 
 
 
 #### 演示视频
