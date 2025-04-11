@@ -51,12 +51,12 @@ WebStorm OR VScode 编译器 [https://www.jianshu.com/p/d63b5bae9dff]
 admin
 1234qwer
 
-[用户]
-fank
+[教师]
+TEA-1711427557731
 1234qwer
 
-[商家]
-shangjia
+[学生/家长]
+STU-1711448008692
 1234qwer
 
 
